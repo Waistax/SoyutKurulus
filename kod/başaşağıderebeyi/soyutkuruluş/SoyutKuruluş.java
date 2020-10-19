@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.List;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.4";
+	public static final String SÜRÜM = "0.5";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
@@ -62,6 +62,7 @@ public class SoyutKuruluş implements Uygulama {
 		}
 		if (dünya != null)
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);
+		GÖRSELLEŞTİRİCİ.çizer.drawString("Kare: " + Motor.kareOranı, 10, 20);
 	}
 
 	@Override

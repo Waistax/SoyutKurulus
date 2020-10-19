@@ -24,6 +24,7 @@ public class Dünya {
 	public final List<Ulus> uluslar;
 	public final Map<Vektör2, Şehir> şehirler;
 	public final Map<Kenar, Yol> yollar;
+	public final Calendar takvim;
 
 	public Dünya() {
 		bölgeler = new ArrayList<>();
@@ -32,6 +33,9 @@ public class Dünya {
 		uluslar = new ArrayList<>();
 		şehirler = new HashMap<>();
 		yollar = new HashMap<>();
+		takvim = Calendar.getInstance();
+		takvim.clear();
+		takvim.set(0, 11, 31);
 	}
 	
 	public void şekliGüncelle() {

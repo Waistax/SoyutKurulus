@@ -13,6 +13,7 @@ import başaşağıderebeyi.soyutkuruluş.ulus.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
+import java.util.*;
 
 public class DünyaArayüzü {
 	public static final float KÖŞE_YARIÇAPI = 0.05F;
@@ -26,18 +27,64 @@ public class DünyaArayüzü {
 	public static final int YAKINLAŞTIRMA_TAVAN = 12;
 	public static final int YAKINLAŞTIRMA_TABAN = 8;
 	public static final DecimalFormat ÜRETİM_SAYI_ŞABLONU = new DecimalFormat("0.00");
+	public static final DateFormat TAKVİM_TARİHİ_ŞABLONU = DateFormat.getDateInstance(DateFormat.LONG);
+	public static final float[] GÜN_SÜRELERİ = { 3.0F, 1.0F, 0.3F, 0.1F, 0.03F, 0.01F, 0.003F, 0.0F };
+	
+	static {
+		for (int i = 0; i < GÜN_SÜRELERİ.length; i++)
+			GÜN_SÜRELERİ[i] *= 1000000000.0F;
+	}
 	
 	public final Vektör2 kamera;
 	
 	public int yakınlaştırma;
 	public float ölçek;
+	public float sonZaman;
+	public int hız;
+	public float bekleme;
+	public boolean duraklatıldı;
 	
 	public DünyaArayüzü() {
 		kamera = new Vektör2();
 		başlangıçKamerası();
+		sonZaman = 0.0F;
+		hız = 3;
+		bekleme = 0.0F;
 	}
 	
 	public void kare(final Girdi girdi, final Graphics2D çizer, final Dünya dünya) {
+		final float şimdikiZaman = Motor.zaman();
+		if (!duraklatıldı) {
+			if (sonZaman != 0.0F)
+				bekleme += şimdikiZaman - sonZaman;
+			sonZaman = şimdikiZaman;
+			if (bekleme >= GÜN_SÜRELERİ[hız]) {
+				bekleme -= GÜN_SÜRELERİ[hız];
+				final int eskiAy = dünya.takvim.get(Calendar.MONTH);
+				dünya.takvim.add(Calendar.DAY_OF_MONTH, 1);
+				günlük();
+				if (eskiAy != dünya.takvim.get(Calendar.MONTH)) {
+					aylık();
+					if (eskiAy == 11)
+						yıllık();
+				}
+			}
+		}
+		if (girdi.tuşBasıldı[KeyEvent.VK_SPACE]) {
+			duraklatıldı = !duraklatıldı;
+			bekleme = 0.0F;
+			sonZaman = 0.0F;
+		}
+		if (girdi.tuşBasıldı[KeyEvent.VK_UP] && hız < GÜN_SÜRELERİ.length - 1) {
+			hız++;
+			bekleme = 0.0F;
+			sonZaman = 0.0F;
+		}
+		if (girdi.tuşBasıldı[KeyEvent.VK_DOWN] && hız > 0) {
+			hız--;
+			bekleme = 0.0F;
+			sonZaman = 0.0F;
+		}
 		if (girdi.tekerlek != 0) {
 			final Vektör2 imleçDünyaEski = dünyaKoordinatına(girdi.imleç, new Vektör2());
 			yakınlaştırma += girdi.tekerlek;
@@ -85,8 +132,12 @@ public class DünyaArayüzü {
 		}
 		çizer.setFont(new Font("Verdana", Font.ITALIC, 16));
 		çizer.setColor(Color.WHITE);
-		yazıYaz(çizer, (int)Math.round(SoyutKuruluş.GÖRSELLEŞTİRİCİ.boyut.x / 2.0F), 20, Color.BLACK,
-				dünya.bölgeler.size() + " Bölge, " + dünya.köşeler.size() + " Köşe, " + dünya.kenarlar.size() + " Kenar");
+		yazıYaz(çizer, (int)Math.round(SoyutKuruluş.GÖRSELLEŞTİRİCİ.boyut.x / 2.0F), 30, Color.BLACK,
+				TAKVİM_TARİHİ_ŞABLONU.format(dünya.takvim.getTime()),
+				"Hız: " + hız);
+		if (duraklatıldı)
+			yazıYaz(çizer, (int)Math.round(SoyutKuruluş.GÖRSELLEŞTİRİCİ.boyut.x / 2.0F), 100, Color.BLACK,
+				"D U R A K L A T I L D I !");
 	}
 	
 	public Vektör2 ekranKoordinatına(final Vektör2 dünyaKoordinatı, final Vektör2 hedef) {
@@ -128,5 +179,14 @@ public class DünyaArayüzü {
 			y += yükseklik;
 			çizer.drawString(yazı, kaydırılmışX, y - yazıTipi.getDescent());
 		}
+	}
+	
+	public void günlük() {
+	}
+	
+	public void aylık() {
+	}
+	
+	public void yıllık() {
 	}
 }
