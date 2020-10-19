@@ -62,11 +62,11 @@ public class DünyaArayüzü {
 				bekleme -= GÜN_SÜRELERİ[hız];
 				final int eskiAy = dünya.takvim.get(Calendar.MONTH);
 				dünya.takvim.add(Calendar.DAY_OF_MONTH, 1);
-				günlük();
+				günlük(dünya);
 				if (eskiAy != dünya.takvim.get(Calendar.MONTH)) {
-					aylık();
+					aylık(dünya);
 					if (eskiAy == 11)
-						yıllık();
+						yıllık(dünya);
 				}
 			}
 		}
@@ -99,27 +99,31 @@ public class DünyaArayüzü {
 		final Vektör2 konum = new Vektör2();
 		final Vektör2 başlangıç = new Vektör2();
 		final Vektör2 bitiş = new Vektör2();
+		final Stroke kalınlık = çizer.getStroke();
+		final Stroke yolKalınlığı = new BasicStroke(ölçek / 10.0F);
 		for (final Kenar kenar : dünya.kenarlar) {
 			final Yol yol = dünya.yollar.get(kenar);
 			çizer.setColor(yol != null ? yol.ulus.renk : Color.WHITE);
-			ekranKoordinatına(kenar.başlangıç, başlangıç).yuvarla();
-			ekranKoordinatına(kenar.bitiş, bitiş).yuvarla();
+			çizer.setStroke(yol != null ? yolKalınlığı : kalınlık);
+			ekranKoordinatına(kenar.başlangıç.konum, başlangıç).yuvarla();
+			ekranKoordinatına(kenar.bitiş.konum, bitiş).yuvarla();
 			çizer.drawLine((int)başlangıç.x, (int)başlangıç.y, (int)bitiş.x, (int)bitiş.y);
 		}
+		çizer.setStroke(kalınlık);
 		final Vektör2 köşeDaireÖlçekli = new Vektör2(KÖŞE_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
 		final Vektör2 şehirDaireÖlçekli = new Vektör2(ŞEHİR_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
-		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 10.0F)));
-		for (final Vektör2 köşe : dünya.köşeler) {
+		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 8.0F)));
+		for (final Köşe köşe : dünya.köşeler) {
 			final Şehir şehir = dünya.şehirler.get(köşe);
 			if (şehir != null) {
-				ekranKoordinatına(konum.çıkar(köşe, ŞEHİR_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
+				ekranKoordinatına(konum.çıkar(köşe.konum, ŞEHİR_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
 				çizer.setColor(şehir.ulus.renk);
 				çizer.fillOval((int)konum.x, (int)konum.y, (int)şehirDaireÖlçekli.x, (int)şehirDaireÖlçekli.y);
-				ekranKoordinatına(köşe, konum);
+				ekranKoordinatına(köşe.konum, konum);
 				çizer.setColor(Color.BLACK);
 				yazıYaz(çizer, (int)konum.x, (int)konum.y, null, ÜRETİM_SAYI_ŞABLONU.format(şehir.seviye));
 			} else {
-				ekranKoordinatına(konum.çıkar(köşe, KÖŞE_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
+				ekranKoordinatına(konum.çıkar(köşe.konum, KÖŞE_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
 				çizer.setColor(Color.WHITE);
 				çizer.fillOval((int)konum.x, (int)konum.y, (int)köşeDaireÖlçekli.x, (int)köşeDaireÖlçekli.y);
 			}
@@ -181,12 +185,27 @@ public class DünyaArayüzü {
 		}
 	}
 	
-	public void günlük() {
+	public void günlük(final Dünya dünya) {
+		for (final Ulus ulus : dünya.uluslar) {
+			for (final Şehir şehir : ulus.şehirler) {
+				final float buğdayGereksinimi = şehir.seviye * şehir.seviye * 0.2F;
+				final float cevherGereksinimi = buğdayGereksinimi * 1.5F;
+				if (ulus.envanter[Kaynak.BUĞDAY.ordinal()] >= buğdayGereksinimi &&
+						ulus.envanter[Kaynak.CEVHER.ordinal()] >= cevherGereksinimi) {
+					ulus.envanter[Kaynak.BUĞDAY.ordinal()] -= buğdayGereksinimi;
+					ulus.envanter[Kaynak.CEVHER.ordinal()] -= cevherGereksinimi;
+					şehir.seviye += 0.01F;
+				}
+			}
+		}
 	}
 	
-	public void aylık() {
+	public void aylık(final Dünya dünya) {
+		for (final Şehir şehir : dünya.şehirler.values())
+			for (final Bölge bölge : şehir.köşe.bölgeler)
+				şehir.ulus.envanter[bölge.kaynak.ordinal()] += bölge.üretim * şehir.seviye;
 	}
 	
-	public void yıllık() {
+	public void yıllık(final Dünya dünya) {
 	}
 }

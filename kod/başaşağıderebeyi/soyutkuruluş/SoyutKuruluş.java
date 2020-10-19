@@ -6,7 +6,6 @@
 package başaşağıderebeyi.soyutkuruluş;
 
 import başaşağıderebeyi.awtkütüphanesi.*;
-import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.motor.*;
 import başaşağıderebeyi.soyutkuruluş.dünya.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
@@ -18,7 +17,7 @@ import java.util.*;
 import java.util.List;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.5";
+	public static final String SÜRÜM = "0.6";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
@@ -51,17 +50,21 @@ public class SoyutKuruluş implements Uygulama {
 			dünya = yaratıcı.yarat();
 			final Random rastgele = new Random();
 			final Ulus ulus = new Ulus(dünya, new Color(1.0F, 0.2F, 0.2F, 1.0F));
-			final Vektör2 köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
-			final List<Kenar> bağlıKenarlar = new ArrayList<>();
-			for (final Kenar kenar : dünya.kenarlar)
-				if (Dünya.aynı(kenar.başlangıç, köşe) || Dünya.aynı(kenar.bitiş, köşe))
-					bağlıKenarlar.add(kenar);
-			final Kenar kenar = bağlıKenarlar.get(rastgele.nextInt(bağlıKenarlar.size()));
+			final Köşe köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
+			final List<Kenar> kenarlar = new ArrayList<>(köşe.kenarlar.keySet());
 			dünya.şehirOluştur(ulus, köşe);
-			dünya.yolOluştur(ulus, kenar);
+			dünya.yolOluştur(ulus, kenarlar.get(rastgele.nextInt(kenarlar.size())));
 		}
-		if (dünya != null)
+		if (dünya != null) {
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);
+			final Ulus ulus = dünya.uluslar.get(0);
+			for (int i = 0; i < Kaynak.DEĞERLER.length; i++) {
+				GÖRSELLEŞTİRİCİ.çizer.setColor(Kaynak.DEĞERLER[i].renk);
+				GÖRSELLEŞTİRİCİ.çizer.drawString(Kaynak.DEĞERLER[i] + ": " + ulus.envanter[i], 10, 50 + i * 20);
+			}
+		}
+		GÖRSELLEŞTİRİCİ.çizer.setFont(new Font("Verdana", Font.ITALIC, 16));
+		GÖRSELLEŞTİRİCİ.çizer.setColor(Color.WHITE);
 		GÖRSELLEŞTİRİCİ.çizer.drawString("Kare: " + Motor.kareOranı, 10, 20);
 	}
 

@@ -5,15 +5,13 @@
  */
 package başaşağıderebeyi.soyutkuruluş.dünya;
 
-import başaşağıderebeyi.matematik.*;
-
 public class Kenar {
-	public final Bölge altıgen;
-	public final Vektör2 başlangıç;
-	public final Vektör2 bitiş;
+	public final Bölge bölge;
+	public final Köşe başlangıç;
+	public final Köşe bitiş;
 
-	public Kenar(final Bölge altıgen, final Vektör2 başlangıç, final Vektör2 bitiş) {
-		this.altıgen = altıgen;
+	public Kenar(final Bölge bölge, final Köşe başlangıç, final Köşe bitiş) {
+		this.bölge = bölge;
 		this.başlangıç = başlangıç;
 		this.bitiş = bitiş;
 	}

@@ -11,7 +11,7 @@ import başaşağıderebeyi.soyutkuruluş.dünya.*;
 import java.util.*;
 
 public class RastgeleYaratıcı implements Yaratıcı {
-	public static final int RASTGELE_SATIR_TAVAN = 5;
+	public static final int RASTGELE_SATIR_TAVAN = 3;
 	public static final int RASTGELE_SATIR_TABAN = 3;
 	public static final float ÜRETİM_TAVAN = 5.0F;
 	public static final float ÜRETİM_TABAN = 1.0F;

@@ -24,7 +24,7 @@ public class Bölge {
 	
 	public final Dünya dünya;
 	public final Vektör2 merkez;
-	public final Vektör2[] köşeler;
+	public final Köşe[] köşeler;
 	public final Kenar[] kenarlar;
 	public final Kaynak kaynak;
 	public final float üretim;
@@ -32,14 +32,14 @@ public class Bölge {
 	public Bölge(final Dünya dünya, final Vektör2 merkez, final Kaynak kaynak, final float üretim) {
 		this.dünya = dünya;
 		this.merkez = merkez;
-		köşeler = new Vektör2[KENAR_SAYISI];
+		köşeler = new Köşe[KENAR_SAYISI];
 		kenarlar = new Kenar[KENAR_SAYISI];
 		this.kaynak = kaynak;
 		this.üretim = üretim;
 		for (int i = 0; i < KENAR_SAYISI; i++)
-			köşeler[i] = new Vektör2(merkez);
+			köşeler[i] = new Köşe(new Vektör2(merkez));
 		for (int i = 0; i < KENAR_SAYISI; i++) {
-			köşeler[i].topla(KÖŞELER[i]);
+			köşeler[i].konum.topla(KÖŞELER[i]);
 			kenarlar[i] = new Kenar(this, köşeler[i], köşeler[i < KENAR_SAYISI - 1 ? i + 1 : 0]);
 		}
 	}

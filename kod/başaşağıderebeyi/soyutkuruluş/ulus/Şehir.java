@@ -5,22 +5,21 @@
  */
 package başaşağıderebeyi.soyutkuruluş.ulus;
 
-import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.soyutkuruluş.dünya.*;
 
 import java.util.*;
 
 public class Şehir {
 	public final Ulus ulus;
-	public final Vektör2 köşe;
+	public final Köşe köşe;
 	public final List<Bölge> komşuBölgeler;
 	
 	public float seviye;
 	
-	public Şehir(final Ulus ulus, final Vektör2 köşe) {
+	public Şehir(final Ulus ulus, final Köşe köşe) {
 		this.ulus = ulus;
 		this.köşe = köşe;
-		komşuBölgeler = new ArrayList<>();
+		komşuBölgeler = new ArrayList<>(3);
 		seviye = 1.0F;
 		ulus.şehirler.add(this);
 	}
