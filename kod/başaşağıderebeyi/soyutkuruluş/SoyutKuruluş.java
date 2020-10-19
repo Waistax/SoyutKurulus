@@ -6,15 +6,19 @@
 package başaşağıderebeyi.soyutkuruluş;
 
 import başaşağıderebeyi.awtkütüphanesi.*;
+import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.motor.*;
 import başaşağıderebeyi.soyutkuruluş.dünya.*;
+import başaşağıderebeyi.soyutkuruluş.ulus.*;
 import başaşağıderebeyi.soyutkuruluş.yaratıcı.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.3";
+	public static final String SÜRÜM = "0.4";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
@@ -45,6 +49,16 @@ public class SoyutKuruluş implements Uygulama {
 	public void kare() {
 		if (GÖRSELLEŞTİRİCİ.girdi.tuşBasıldı[KeyEvent.VK_Y]) {
 			dünya = yaratıcı.yarat();
+			final Random rastgele = new Random();
+			final Ulus ulus = new Ulus(dünya, new Color(1.0F, 0.2F, 0.2F, 1.0F));
+			final Vektör2 köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
+			final List<Kenar> bağlıKenarlar = new ArrayList<>();
+			for (final Kenar kenar : dünya.kenarlar)
+				if (Dünya.aynı(kenar.başlangıç, köşe) || Dünya.aynı(kenar.bitiş, köşe))
+					bağlıKenarlar.add(kenar);
+			final Kenar kenar = bağlıKenarlar.get(rastgele.nextInt(bağlıKenarlar.size()));
+			dünya.şehirOluştur(ulus, köşe);
+			dünya.yolOluştur(ulus, kenar);
 		}
 		if (dünya != null)
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);

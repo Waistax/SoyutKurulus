@@ -42,26 +42,13 @@ public class RastgeleYaratıcı implements Yaratıcı {
 				}
 				final Bölge bölge = new Bölge(dünya, merkez, Kaynak.rastgele(rastgele), rastgele.nextFloat() * (ÜRETİM_TAVAN - ÜRETİM_TABAN) + ÜRETİM_TABAN);
 				dünya.bölgeler.add(bölge);
-				köşeler:for (final Vektör2 köşe : bölge.köşeler) {
-					for (final Vektör2 diğerKöşe : dünya.köşeler)
-						if (diğerKöşe.eşittir(köşe))
-							continue köşeler;
-					dünya.köşeler.add(köşe);
-				}
-				kenarlar:for (final Kenar kenar : bölge.kenarlar) {
-					for (final Kenar diğerKenar : dünya.kenarlar)
-						if (
-								(diğerKenar.başlangıç.eşittir(kenar.başlangıç) && diğerKenar.bitiş.eşittir(kenar.bitiş)) ||
-								(diğerKenar.başlangıç.eşittir(kenar.bitiş) && diğerKenar.bitiş.eşittir(kenar.başlangıç)))
-							continue kenarlar;
-					dünya.kenarlar.add(kenar);
-				}
 			}
 			if (i < 0)
 				satırSaçılması++;
 			else
 				satırSaçılması--;
 		}
+		dünya.şekliGüncelle();
 		return dünya;
 	}
 }
