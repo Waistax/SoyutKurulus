@@ -9,7 +9,7 @@ import başaşağıderebeyi.matematik.*;
 
 public class Bölge {
 	public static final int KENAR_SAYISI = 6;
-	public static final float KENAR_UZUNLUĞU = 100.0F;
+	public static final float KENAR_UZUNLUĞU = 1.0F;
 	public static final double KENAR_AÇISI = Math.PI * 2.0D / KENAR_SAYISI;
 	public static final float KENAR_SİNÜS = (float)Math.sin(KENAR_AÇISI) * KENAR_UZUNLUĞU;
 	public static final float KENAR_KOSİNÜS = (float)Math.cos(KENAR_AÇISI) * KENAR_UZUNLUĞU;
@@ -26,12 +26,16 @@ public class Bölge {
 	public final Vektör2 merkez;
 	public final Vektör2[] köşeler;
 	public final Kenar[] kenarlar;
+	public final Kaynak kaynak;
+	public final float üretim;
 	
-	public Bölge(final Dünya dünya, final Vektör2 merkez) {
+	public Bölge(final Dünya dünya, final Vektör2 merkez, final Kaynak kaynak, final float üretim) {
 		this.dünya = dünya;
 		this.merkez = merkez;
 		köşeler = new Vektör2[KENAR_SAYISI];
 		kenarlar = new Kenar[KENAR_SAYISI];
+		this.kaynak = kaynak;
+		this.üretim = üretim;
 		for (int i = 0; i < KENAR_SAYISI; i++)
 			köşeler[i] = new Vektör2(merkez);
 		for (int i = 0; i < KENAR_SAYISI; i++) {
