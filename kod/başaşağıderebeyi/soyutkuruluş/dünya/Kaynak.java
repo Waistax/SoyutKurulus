@@ -21,9 +21,11 @@ public enum Kaynak {
 		return DEĞERLER[rastgele.nextInt(DEĞERLER.length)];
 	}
 	
+	public final int sıra;
 	public final Color renk;
 
 	private Kaynak(Color renk) {
+		this.sıra = ordinal();
 		this.renk = renk;
 	}
 }

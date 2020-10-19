@@ -5,6 +5,8 @@
  */
 package başaşağıderebeyi.soyutkuruluş;
 
+import static başaşağıderebeyi.soyutkuruluş.dünya.Kaynak.*;
+
 import başaşağıderebeyi.awtkütüphanesi.*;
 import başaşağıderebeyi.motor.*;
 import başaşağıderebeyi.soyutkuruluş.dünya.*;
@@ -17,7 +19,7 @@ import java.util.*;
 import java.util.List;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.6";
+	public static final String SÜRÜM = "0.7";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
@@ -49,7 +51,8 @@ public class SoyutKuruluş implements Uygulama {
 		if (GÖRSELLEŞTİRİCİ.girdi.tuşBasıldı[KeyEvent.VK_Y]) {
 			dünya = yaratıcı.yarat();
 			final Random rastgele = new Random();
-			final Ulus ulus = new Ulus(dünya, new Color(1.0F, 0.2F, 0.2F, 1.0F));
+			dünya.ulusOluştur(new Color(1.0F, 0.2F, 0.2F, 1.0F));
+			final Ulus ulus = dünya.uluslar.get(0);
 			final Köşe köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
 			final List<Kenar> kenarlar = new ArrayList<>(köşe.kenarlar.keySet());
 			dünya.şehirOluştur(ulus, köşe);
@@ -58,9 +61,11 @@ public class SoyutKuruluş implements Uygulama {
 		if (dünya != null) {
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);
 			final Ulus ulus = dünya.uluslar.get(0);
-			for (int i = 0; i < Kaynak.DEĞERLER.length; i++) {
-				GÖRSELLEŞTİRİCİ.çizer.setColor(Kaynak.DEĞERLER[i].renk);
-				GÖRSELLEŞTİRİCİ.çizer.drawString(Kaynak.DEĞERLER[i] + ": " + ulus.envanter[i], 10, 50 + i * 20);
+			GÖRSELLEŞTİRİCİ.çizer.setColor(Color.WHITE);
+			GÖRSELLEŞTİRİCİ.çizer.drawString("GÜMÜŞ: " + ulus.gümüş, 10, 50);
+			for (int i = 0; i < DEĞERLER.length; i++) {
+				GÖRSELLEŞTİRİCİ.çizer.setColor(DEĞERLER[i].renk);
+				GÖRSELLEŞTİRİCİ.çizer.drawString(DEĞERLER[i] + ": " + ulus.envanter[i], 10, 70 + i * 20);
 			}
 		}
 		GÖRSELLEŞTİRİCİ.çizer.setFont(new Font("Verdana", Font.ITALIC, 16));

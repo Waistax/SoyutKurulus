@@ -62,11 +62,11 @@ public class DünyaArayüzü {
 				bekleme -= GÜN_SÜRELERİ[hız];
 				final int eskiAy = dünya.takvim.get(Calendar.MONTH);
 				dünya.takvim.add(Calendar.DAY_OF_MONTH, 1);
-				günlük(dünya);
+				dünya.günlük();
 				if (eskiAy != dünya.takvim.get(Calendar.MONTH)) {
-					aylık(dünya);
+					dünya.aylık();
 					if (eskiAy == 11)
-						yıllık(dünya);
+						dünya.yıllık();
 				}
 			}
 		}
@@ -183,29 +183,5 @@ public class DünyaArayüzü {
 			y += yükseklik;
 			çizer.drawString(yazı, kaydırılmışX, y - yazıTipi.getDescent());
 		}
-	}
-	
-	public void günlük(final Dünya dünya) {
-		for (final Ulus ulus : dünya.uluslar) {
-			for (final Şehir şehir : ulus.şehirler) {
-				final float buğdayGereksinimi = şehir.seviye * şehir.seviye * 0.2F;
-				final float cevherGereksinimi = buğdayGereksinimi * 1.5F;
-				if (ulus.envanter[Kaynak.BUĞDAY.ordinal()] >= buğdayGereksinimi &&
-						ulus.envanter[Kaynak.CEVHER.ordinal()] >= cevherGereksinimi) {
-					ulus.envanter[Kaynak.BUĞDAY.ordinal()] -= buğdayGereksinimi;
-					ulus.envanter[Kaynak.CEVHER.ordinal()] -= cevherGereksinimi;
-					şehir.seviye += 0.01F;
-				}
-			}
-		}
-	}
-	
-	public void aylık(final Dünya dünya) {
-		for (final Şehir şehir : dünya.şehirler.values())
-			for (final Bölge bölge : şehir.köşe.bölgeler)
-				şehir.ulus.envanter[bölge.kaynak.ordinal()] += bölge.üretim * şehir.seviye;
-	}
-	
-	public void yıllık(final Dünya dünya) {
 	}
 }

@@ -16,4 +16,8 @@ public class Yol {
 		this.kenar = kenar;
 		ulus.yollar.add(this);
 	}
+	
+	public void topla() {
+		ulus.ekle(null, 0.05F);
+	}
 }

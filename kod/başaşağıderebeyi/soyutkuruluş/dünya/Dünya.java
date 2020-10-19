@@ -5,10 +5,15 @@
  */
 package başaşağıderebeyi.soyutkuruluş.dünya;
 
+import static başaşağıderebeyi.soyutkuruluş.dünya.Kaynak.*;
+
 import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
+import başaşağıderebeyi.soyutkuruluş.zeka.*;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class Dünya {
 	public static final float ASGARİ_MESAFE = 0.9F;
@@ -21,6 +26,7 @@ public class Dünya {
 	public final List<Köşe> köşeler;
 	public final List<Kenar> kenarlar;
 	public final List<Ulus> uluslar;
+	public final List<Takas> takaslar;
 	public final Map<Köşe, Şehir> şehirler;
 	public final Map<Kenar, Yol> yollar;
 	public final Calendar takvim;
@@ -30,11 +36,16 @@ public class Dünya {
 		köşeler = new ArrayList<>();
 		kenarlar = new ArrayList<>();
 		uluslar = new ArrayList<>();
+		takaslar = new ArrayList<>();
 		şehirler = new HashMap<>();
 		yollar = new HashMap<>();
 		takvim = Calendar.getInstance();
 		takvim.clear();
 		takvim.set(0, 11, 31);
+		for (final Kaynak kaynak : DEĞERLER) {
+			takaslar.add(new Takas(null, kaynak, 0.25F));
+			takaslar.add(new Takas(kaynak, null, 1.0F));
+		}
 	}
 	
 	public void şekliGüncelle() {
@@ -99,6 +110,13 @@ public class Dünya {
 		System.gc();
 	}
 	
+	public void ulusOluştur(final Color renk) {
+		final Ulus ulus = new Ulus(this, renk);
+		for (int i = 0; i < DEĞERLER.length * 2; i++)
+			ulus.takaslar.add(takaslar.get(i));
+		ulus.zeka = new DurgunZeka(ulus);
+	}
+	
 	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
 		if (şehirler.containsKey(köşe))
 			return;
@@ -120,5 +138,24 @@ public class Dünya {
 			return;
 		final Yol yol = new Yol(ulus, kenar);
 		yollar.put(kenar, yol);
+	}
+	
+	public void günlük() {
+		for (final Yol yol : yollar.values())
+			yol.topla();
+		for (final Ulus ulus : uluslar)
+			ulus.zeka.günlük();
+	}
+	
+	public void aylık() {
+		for (final Şehir şehir : şehirler.values())
+			şehir.topla();
+		for (final Ulus ulus : uluslar)
+			ulus.zeka.aylık();
+	}
+	
+	public void yıllık() {
+		for (final Ulus ulus : uluslar)
+			ulus.zeka.yıllık();
 	}
 }
