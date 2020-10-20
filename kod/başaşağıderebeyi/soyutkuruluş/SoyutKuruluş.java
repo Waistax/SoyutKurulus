@@ -15,11 +15,9 @@ import başaşağıderebeyi.soyutkuruluş.yaratıcı.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
-import java.util.List;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.7";
+	public static final String SÜRÜM = "0.8";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
@@ -48,16 +46,8 @@ public class SoyutKuruluş implements Uygulama {
 
 	@Override
 	public void kare() {
-		if (GÖRSELLEŞTİRİCİ.girdi.tuşBasıldı[KeyEvent.VK_Y]) {
+		if (GÖRSELLEŞTİRİCİ.girdi.tuşBasıldı[KeyEvent.VK_Y])
 			dünya = yaratıcı.yarat();
-			final Random rastgele = new Random();
-			dünya.ulusOluştur(new Color(1.0F, 0.2F, 0.2F, 1.0F));
-			final Ulus ulus = dünya.uluslar.get(0);
-			final Köşe köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
-			final List<Kenar> kenarlar = new ArrayList<>(köşe.kenarlar.keySet());
-			dünya.şehirOluştur(ulus, köşe);
-			dünya.yolOluştur(ulus, kenarlar.get(rastgele.nextInt(kenarlar.size())));
-		}
 		if (dünya != null) {
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);
 			final Ulus ulus = dünya.uluslar.get(0);

@@ -9,7 +9,6 @@ import static başaşağıderebeyi.soyutkuruluş.dünya.Kaynak.*;
 
 import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
-import başaşağıderebeyi.soyutkuruluş.zeka.*;
 
 import java.awt.*;
 import java.util.*;
@@ -107,6 +106,10 @@ public class Dünya {
 					köşe.kenarlar.put(kenar, false);
 			}
 		}
+		for (final Kenar kenar : kenarlar) {
+			kenar.kenarlar.addAll(kenar.başlangıç.kenarlar.keySet());
+			kenar.kenarlar.addAll(kenar.bitiş.kenarlar.keySet());
+		}
 		System.gc();
 	}
 	
@@ -114,28 +117,65 @@ public class Dünya {
 		final Ulus ulus = new Ulus(this, renk);
 		for (int i = 0; i < DEĞERLER.length * 2; i++)
 			ulus.takaslar.add(takaslar.get(i));
-		ulus.zeka = new DurgunZeka(ulus);
+	}
+	
+	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
+		if (şehirler.containsKey(köşe))
+			return false;
+		for (final Kenar kenar : köşe.kenarlar.keySet())
+			if (köşe.kenarlar.get(kenar)) {
+				if (şehirler.containsKey(kenar.bitiş))
+					return false;
+			} else {
+				if (şehirler.containsKey(kenar.başlangıç))
+					return false;
+			}
+		return true;
 	}
 	
 	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
-		if (şehirler.containsKey(köşe))
+		if (!(
+				ulus.dene(BUĞDAY, 1.0F) &&
+				ulus.dene(KOYUN, 1.0F) &&
+				ulus.dene(ODUN, 1.0F) &&
+				ulus.dene(TUĞLA, 1.0F)))
 			return;
-		for (final Kenar kenar : kenarlar) {
-			if (köşe == kenar.başlangıç) {
-				if (şehirler.containsKey(kenar.bitiş))
-					return;
-			} else if (köşe == kenar.bitiş) {
-				if (şehirler.containsKey(kenar.başlangıç))
-					return;
-			}
-		}
+		if (!şehirOluşturabilirMi(ulus, köşe))
+			return;
+		ulus.ekle(BUĞDAY, -1.0F);
+		ulus.ekle(KOYUN, -1.0F);
+		ulus.ekle(ODUN, -1.0F);
+		ulus.ekle(TUĞLA, -1.0F);
 		final Şehir şehir = new Şehir(ulus, köşe);
 		şehirler.put(köşe, şehir);
 	}
 	
-	public void yolOluştur(final Ulus ulus, final Kenar kenar) {
+	public boolean yolOluşturabilirMi(final Ulus ulus, final Kenar kenar) {
 		if (yollar.containsKey(kenar))
+			return false;
+		final Şehir başlangıç = şehirler.get(kenar.başlangıç);
+		if (başlangıç != null && başlangıç.ulus == ulus)
+			return true;
+		final Şehir bitiş = şehirler.get(kenar.bitiş);
+		if (bitiş != null && bitiş.ulus == ulus)
+			return true;
+		for (final Kenar diğerKenar : kenar.kenarlar) {
+			final Yol bağlantı = yollar.get(diğerKenar);
+			if (bağlantı != null && bağlantı.ulus == ulus)
+				return true;
+		}
+		return false;
+	}
+	
+	public void yolOluştur(final Ulus ulus, final Kenar kenar) {
+		if (!(
+				ulus.dene(ODUN, 1.0F) &&
+				ulus.dene(TUĞLA, 1.0F)))
 			return;
+		if (!yolOluşturabilirMi(ulus, kenar))
+			return;
+		ulus.ekle(ODUN, -1.0F);
+		ulus.ekle(TUĞLA, -1.0F);
 		final Yol yol = new Yol(ulus, kenar);
 		yollar.put(kenar, yol);
 	}
