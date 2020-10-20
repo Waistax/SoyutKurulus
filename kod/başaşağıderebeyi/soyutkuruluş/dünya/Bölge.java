@@ -27,9 +27,9 @@ public class Bölge {
 	public final Köşe[] köşeler;
 	public final Kenar[] kenarlar;
 	public final Kaynak kaynak;
-	public final float üretim;
+	public final int üretim;
 	
-	public Bölge(final Dünya dünya, final Vektör2 merkez, final Kaynak kaynak, final float üretim) {
+	public Bölge(final Dünya dünya, final Vektör2 merkez, final Kaynak kaynak, final int üretim) {
 		this.dünya = dünya;
 		this.merkez = merkez;
 		köşeler = new Köşe[KENAR_SAYISI];

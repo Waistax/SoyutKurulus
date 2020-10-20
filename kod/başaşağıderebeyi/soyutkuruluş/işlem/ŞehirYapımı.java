@@ -18,10 +18,13 @@ public class ŞehirYapımı extends Süreliİşlem {
 		super(ulus.dünya, Calendar.DAY_OF_MONTH, 300);
 		this.ulus = ulus;
 		this.köşe = köşe;
+		ulus.dünya.yapılanŞehirler.put(köşe, this);
 	}
 
 	@Override
 	public void tamamlandı() {
 		ulus.dünya.şehirler.put(köşe, new Şehir(ulus, köşe));
+		ulus.dünya.yapılanŞehirler.remove(köşe);
+		ulus.geliriHesapla();
 	}
 }

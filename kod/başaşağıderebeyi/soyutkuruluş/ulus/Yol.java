@@ -18,6 +18,6 @@ public class Yol {
 	}
 	
 	public void topla() {
-		ulus.ekle(null, 0.01F);
+		ulus.ekle(null, 1);
 	}
 }

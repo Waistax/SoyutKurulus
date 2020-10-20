@@ -14,15 +14,15 @@ import java.awt.*;
 import java.util.*;
 
 public class RastgeleYaratıcı implements Yaratıcı {
-	public static final int RASTGELE_SATIR_TAVAN = 3;
-	public static final int RASTGELE_SATIR_TABAN = 3;
-	public static final float ÜRETİM_TAVAN = 5.0F;
-	public static final float ÜRETİM_TABAN = 1.0F;
+	public static final int RASTGELE_SATIR_TAVAN = 2;
+	public static final int RASTGELE_SATIR_TABAN = 2;
+	public static final int ÜRETİM_TAVAN = 5;
+	public static final int ÜRETİM_TABAN = 1;
 	public static final Color[] ULUS_RENKLERİ = {
 			new Color(1.0F, 0.4F, 0.4F, 1.0F),
 			new Color(0.4F, 1.0F, 0.4F, 1.0F),
 			new Color(0.4F, 0.4F, 1.0F, 1.0F),
-			new Color(0.6F, 0.6F, 0.6F, 1.0F)
+			new Color(1.0F, 0.6F, 0.2F, 1.0F)
 	};
 	
 	private final Random rastgele;
@@ -49,7 +49,7 @@ public class RastgeleYaratıcı implements Yaratıcı {
 						continue yatay;
 					merkez.x += Bölge.KENAR_SİNÜS * (j < 0 ? 1.0F : -1.0F);
 				}
-				final Bölge bölge = new Bölge(dünya, merkez, Kaynak.rastgele(rastgele), rastgele.nextFloat() * (ÜRETİM_TAVAN - ÜRETİM_TABAN) + ÜRETİM_TABAN);
+				final Bölge bölge = new Bölge(dünya, merkez, Kaynak.rastgele(rastgele), rastgele.nextInt(ÜRETİM_TAVAN - ÜRETİM_TABAN + 1) + ÜRETİM_TABAN);
 				dünya.bölgeler.add(bölge);
 			}
 			if (i < 0)
@@ -61,11 +61,12 @@ public class RastgeleYaratıcı implements Yaratıcı {
 		for (int i = 0; i < ULUS_RENKLERİ.length; i++) {
 			dünya.ulusOluştur(ULUS_RENKLERİ[i]);
 			final Ulus ulus = dünya.uluslar.get(i);
-			ulus.zeka = rastgele.nextInt(2) == 0 ? new DurgunZeka(ulus) : new BasitZeka(ulus);
+//			ulus.zeka = rastgele.nextInt(2) == 0 ? new DurgunZeka(ulus) : new BasitZeka(ulus);
+			ulus.zeka = new BasitZeka(ulus);
 			Köşe köşe = null;
 			do {
 				köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
-			} while (!dünya.şehirOluşturabilirMi(ulus, köşe));
+			} while (!dünya.başlangıçŞehriOluşturabilirMi(ulus, köşe));
 			dünya.başlangıçŞehriOluştur(ulus, köşe);
 		}
 		return dünya;

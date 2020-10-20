@@ -17,6 +17,8 @@ import java.util.List;
 
 public class Dünya {
 	public static final float ASGARİ_MESAFE = 0.9F;
+	public static final int SEVİYE_TAVAN = 9;
+	public static final int SEVİYE_TABAN = 1;
 	
 	public static boolean aynı(final Vektör2 fark, final Köşe k1, final Köşe k2) {
 		return fark.çıkar(k1.konum, k2.konum).uzunluğunKaresi() < ASGARİ_MESAFE;
@@ -30,6 +32,8 @@ public class Dünya {
 	public final List<Süreliİşlem> işlemler;
 	public final Map<Köşe, Şehir> şehirler;
 	public final Map<Kenar, Yol> yollar;
+	public final Map<Köşe, ŞehirYapımı> yapılanŞehirler;
+	public final Map<Kenar, YolYapımı> yapılanYollar;
 	public final Calendar takvim;
 
 	public Dünya() {
@@ -41,12 +45,14 @@ public class Dünya {
 		işlemler = new ArrayList<>();
 		şehirler = new HashMap<>();
 		yollar = new HashMap<>();
+		yapılanŞehirler = new HashMap<>();
+		yapılanYollar = new HashMap<>();
 		takvim = Calendar.getInstance();
 		takvim.clear();
 		takvim.set(0, 11, 31);
 		for (final Kaynak kaynak : DEĞERLER) {
-			takaslar.add(new Takas(null, kaynak, 0.25F));
-			takaslar.add(new Takas(kaynak, null, 1.0F));
+			takaslar.add(new Takas(null, 100, kaynak, 4));
+			takaslar.add(new Takas(kaynak, 1, null, 100));
 		}
 	}
 	
@@ -116,55 +122,90 @@ public class Dünya {
 		System.gc();
 	}
 	
+	public boolean şehirVarMı(final Köşe köşe) {
+		return şehirler.containsKey(köşe) || yapılanŞehirler.containsKey(köşe);
+	}
+	
+	public boolean yolVarMı(final Kenar kenar) {
+		return yollar.containsKey(kenar) || yapılanYollar.containsKey(kenar);
+	}
+	
 	public void ulusOluştur(final Color renk) {
 		final Ulus ulus = new Ulus(this, renk);
 		for (int i = 0; i < DEĞERLER.length * 2; i++)
 			ulus.takaslar.add(takaslar.get(i));
 	}
-	
-	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
-		if (şehirler.containsKey(köşe))
+
+	public boolean başlangıçŞehriOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
+		if (şehirVarMı(köşe))
 			return false;
-		for (final Süreliİşlem işlem : işlemler)
-			if (işlem instanceof ŞehirYapımı && ((ŞehirYapımı)işlem).köşe == köşe)
-				return false;
 		for (final Kenar kenar : köşe.kenarlar.keySet())
 			if (köşe.kenarlar.get(kenar)) {
-				if (şehirler.containsKey(kenar.bitiş))
+				if (şehirVarMı(kenar.bitiş))
 					return false;
 			} else {
-				if (şehirler.containsKey(kenar.başlangıç))
+				if (şehirVarMı(kenar.başlangıç))
 					return false;
 			}
 		return true;
 	}
 	
-	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
-		if (!(
-				ulus.dene(BUĞDAY, 1.0F) &&
-				ulus.dene(KOYUN, 1.0F) &&
-				ulus.dene(ODUN, 1.0F) &&
-				ulus.dene(TUĞLA, 1.0F)))
-			return;
-		if (!şehirOluşturabilirMi(ulus, köşe))
-			return;
-		ulus.ekle(BUĞDAY, -1.0F);
-		ulus.ekle(KOYUN, -1.0F);
-		ulus.ekle(ODUN, -1.0F);
-		ulus.ekle(TUĞLA, -1.0F);
-		işlemler.add(new ŞehirYapımı(ulus, köşe));
-	}
-	
 	public void başlangıçŞehriOluştur(final Ulus ulus, final Köşe köşe) {
-		if (!şehirOluşturabilirMi(ulus, köşe))
+		if (!başlangıçŞehriOluşturabilirMi(ulus, köşe))
 			return;
 		final Şehir şehir = new Şehir(ulus, köşe);
-		şehir.seviye = 1.0F;
 		ulus.dünya.şehirler.put(köşe, şehir);
 	}
 	
+	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
+		if (!başlangıçŞehriOluşturabilirMi(ulus, köşe))
+			return false;
+		for (final Yol yol : ulus.yollar) {
+			if (yol.kenar.başlangıç == köşe || yol.kenar.bitiş == köşe)
+				return true;
+		}
+		return false;
+	}
+	
+	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
+		if (!(
+				ulus.dene(BUĞDAY) &&
+				ulus.dene(KOYUN) &&
+				ulus.dene(ODUN) &&
+				ulus.dene(TUĞLA)))
+			return;
+		if (!şehirOluşturabilirMi(ulus, köşe))
+			return;
+		ulus.çıkar(BUĞDAY);
+		ulus.çıkar(KOYUN);
+		ulus.çıkar(ODUN);
+		ulus.çıkar(TUĞLA);
+		new ŞehirYapımı(ulus, köşe);
+	}
+	
+	public boolean şehirGeliştirilebilirMi(final Şehir şehir) {
+		if (şehir.seviye >= SEVİYE_TAVAN)
+			return false;
+		for (final Süreliİşlem işlem : işlemler)
+			if (işlem instanceof ŞehirGeliştirmesi && ((ŞehirGeliştirmesi)işlem).şehir == şehir)
+				return false;
+		if (
+				!şehir.ulus.dene(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 2) ||
+				!şehir.ulus.dene(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 3))
+			return false;
+		return true;
+	}
+	
+	public void şehriGeliştir(final Şehir şehir) {
+		if (!şehirGeliştirilebilirMi(şehir))
+			return;
+		şehir.ulus.çıkar(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 2);
+		şehir.ulus.çıkar(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 3);
+		new ŞehirGeliştirmesi(şehir);
+	}
+	
 	public boolean yolOluşturabilirMi(final Ulus ulus, final Kenar kenar) {
-		if (yollar.containsKey(kenar))
+		if (yolVarMı(kenar))
 			return false;
 		for (final Süreliİşlem işlem : işlemler)
 			if (işlem instanceof YolYapımı && ((YolYapımı)işlem).kenar == kenar)
@@ -185,14 +226,14 @@ public class Dünya {
 	
 	public void yolOluştur(final Ulus ulus, final Kenar kenar) {
 		if (!(
-				ulus.dene(ODUN, 1.0F) &&
-				ulus.dene(TUĞLA, 1.0F)))
+				ulus.dene(ODUN) &&
+				ulus.dene(TUĞLA)))
 			return;
 		if (!yolOluşturabilirMi(ulus, kenar))
 			return;
-		ulus.ekle(ODUN, -1.0F);
-		ulus.ekle(TUĞLA, -1.0F);
-		işlemler.add(new YolYapımı(ulus, kenar));
+		ulus.çıkar(ODUN);
+		ulus.çıkar(TUĞLA);
+		new YolYapımı(ulus, kenar);
 	}
 	
 	public void günlük() {
@@ -214,7 +255,6 @@ public class Dünya {
 			if (eskiAy == Calendar.DECEMBER)
 				yıllık();
 		}
-		System.gc();
 	}
 	
 	public void aylık() {

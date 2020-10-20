@@ -15,6 +15,7 @@ public abstract class Süreliİşlem {
 	public Süreliİşlem(final Dünya dünya, final int süreTürü, final int süre) {
 		this.tamamlanmaZamanı = (Calendar)dünya.takvim.clone();
 		tamamlanmaZamanı.add(süreTürü, süre);
+		dünya.işlemler.add(this);
 	}
 	
 	public abstract void tamamlandı();

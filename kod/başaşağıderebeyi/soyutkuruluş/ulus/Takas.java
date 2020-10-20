@@ -9,32 +9,34 @@ import başaşağıderebeyi.soyutkuruluş.dünya.*;
 
 public class Takas {
 	public final Kaynak alınan;
+	public final int alınacak;
 	public final Kaynak verilen;
-	public final float oran;
+	public final int verilecek;
 
-	public Takas(final Kaynak alınan, final Kaynak verilen, final float oran) {
+	public Takas(Kaynak alınan, int alınacak, Kaynak verilen, int verilecek) {
 		this.alınan = alınan;
+		this.alınacak = alınacak;
 		this.verilen = verilen;
-		this.oran = oran;
+		this.verilecek = verilecek;
 	}
-	
-	public void gerçekleştir(final Ulus ulus, final float miktar) {
-		if (!ulus.dene(verilen, miktar))
+
+	public void gerçekleştir(final Ulus ulus) {
+		if (!ulus.dene(verilen, verilecek))
 			return;
-		ulus.ekle(verilen, -miktar);
-		ulus.ekle(alınan, miktar * oran);
+		ulus.çıkar(verilen, verilecek);
+		ulus.ekle(alınan, alınacak);
 	}
 	
 	public void olabildiğince(final Ulus ulus) {
-		gerçekleştir(ulus, ulus.durum(verilen));
+		while (ulus.dene(verilen, verilecek))
+			gerçekleştir(ulus);
 	}
 	
-	public void varanakadar(final Ulus ulus, final float hedef) {
-		final float miktar = hedef - ulus.durum(alınan);
-		final float ödenecek = miktar / oran;
-		if (ulus.dene(verilen, ödenecek))
-			gerçekleştir(ulus, ödenecek);
-		else
-			olabildiğince(ulus);
+	public void varanakadar(final Ulus ulus, final int hedef) {
+		while (ulus.durum(alınan) < hedef)
+			if (ulus.dene(verilen, verilecek))
+				gerçekleştir(ulus);
+			else
+				return;
 	}
 }

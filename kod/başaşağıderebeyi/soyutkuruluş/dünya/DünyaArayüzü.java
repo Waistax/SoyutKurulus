@@ -22,11 +22,10 @@ public class DünyaArayüzü {
 	public static final float ŞEHİR_YARIÇAPI = 0.15F;
 	public static final Vektör2 ŞEHİR_ÇEYREK_DAİRE_VEKTÖRÜ = new Vektör2(ŞEHİR_YARIÇAPI, ŞEHİR_YARIÇAPI);
 	public static final Vektör2 ŞEHİR_DAİRE_VEKTÖRÜ = new Vektör2(ŞEHİR_ÇEYREK_DAİRE_VEKTÖRÜ).çarp(2.0F);
-	public static final float ÖLÇEK_TABANI = 1.5F;
-	public static final int YAKINLAŞTIRMA_BAŞLANGIÇ = 10;
-	public static final int YAKINLAŞTIRMA_TAVAN = 12;
-	public static final int YAKINLAŞTIRMA_TABAN = 8;
-	public static final DecimalFormat ÜRETİM_SAYI_ŞABLONU = new DecimalFormat("0.00");
+	public static final float ÖLÇEK_TABANI = 1.2F;
+	public static final int YAKINLAŞTIRMA_BAŞLANGIÇ = 23;
+	public static final int YAKINLAŞTIRMA_TAVAN = 26;
+	public static final int YAKINLAŞTIRMA_TABAN = 20;
 	public static final DateFormat TAKVİM_TARİHİ_ŞABLONU = DateFormat.getDateInstance(DateFormat.LONG);
 	public static final float[] GÜN_SÜRELERİ = { 3.0F, 1.0F, 0.3F, 0.1F, 0.03F, 0.01F, 0.003F, 0.0F };
 	
@@ -53,6 +52,7 @@ public class DünyaArayüzü {
 	}
 	
 	public void kare(final Girdi girdi, final Graphics2D çizer, final Dünya dünya) {
+		SoyutKuruluş.UYGULAMA.süreceGeç(0);
 		final float şimdikiZaman = Motor.zaman();
 		if (!duraklatıldı) {
 			if (sonZaman != 0.0F)
@@ -63,6 +63,7 @@ public class DünyaArayüzü {
 				dünya.günlük();
 			}
 		}
+		SoyutKuruluş.UYGULAMA.süreceGeç(1);
 		if (girdi.tuşBasıldı[KeyEvent.VK_SPACE]) {
 			duraklatıldı = !duraklatıldı;
 			bekleme = 0.0F;
@@ -105,7 +106,7 @@ public class DünyaArayüzü {
 		çizer.setStroke(kalınlık);
 		final Vektör2 köşeDaireÖlçekli = new Vektör2(KÖŞE_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
 		final Vektör2 şehirDaireÖlçekli = new Vektör2(ŞEHİR_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
-		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 8.0F)));
+		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 4.0F)));
 		for (final Köşe köşe : dünya.köşeler) {
 			final Şehir şehir = dünya.şehirler.get(köşe);
 			if (şehir != null) {
@@ -114,7 +115,7 @@ public class DünyaArayüzü {
 				çizer.fillOval((int)konum.x, (int)konum.y, (int)şehirDaireÖlçekli.x, (int)şehirDaireÖlçekli.y);
 				ekranKoordinatına(köşe.konum, konum);
 				çizer.setColor(Color.BLACK);
-				yazıYaz(çizer, (int)konum.x, (int)konum.y, null, ÜRETİM_SAYI_ŞABLONU.format(şehir.seviye));
+				yazıYaz(çizer, (int)konum.x, (int)konum.y, null, String.valueOf(şehir.seviye));
 			} else {
 				ekranKoordinatına(konum.çıkar(köşe.konum, KÖŞE_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
 				çizer.setColor(Color.WHITE);
@@ -125,7 +126,7 @@ public class DünyaArayüzü {
 		for (final Bölge bölge : dünya.bölgeler) {
 			ekranKoordinatına(bölge.merkez, konum).yuvarla();
 			çizer.setColor(bölge.kaynak.renk);
-			yazıYaz(çizer, (int)konum.x, (int)konum.y, null, bölge.kaynak.toString(), ÜRETİM_SAYI_ŞABLONU.format(bölge.üretim));
+			yazıYaz(çizer, (int)konum.x, (int)konum.y, null, bölge.kaynak.toString(), String.valueOf(bölge.üretim));
 		}
 		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 8.0F)));
 		for (final Süreliİşlem işlem : dünya.işlemler) {
@@ -136,8 +137,41 @@ public class DünyaArayüzü {
 				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));
 			} else if (işlem instanceof ŞehirYapımı) {
 				final ŞehirYapımı yapım = (ŞehirYapımı)işlem;
-				ekranKoordinatına(yapım.köşe.konum, konum).yuvarla();
+				konum.yaz(yapım.köşe.konum);
+				if (yapım.köşe.kenarlar.size() == 3) {
+					int aşağıdakiKomşular = 0;
+					for (final Kenar kenar : yapım.köşe.kenarlar.keySet()) {
+						if (yapım.köşe.kenarlar.get(kenar)) {
+							if (kenar.bitiş.konum.y > yapım.köşe.konum.y)
+								aşağıdakiKomşular++;
+						} else {
+							if (kenar.başlangıç.konum.y > yapım.köşe.konum.y)
+								aşağıdakiKomşular++;
+						}
+					}
+					konum.y += Bölge.KENAR_SİNÜS / (aşağıdakiKomşular > 1 ? 2.0F : -2.0F);
+				} else {
+					konum.y += Bölge.KENAR_SİNÜS / (konum.y > 0.0F ? 2.0F : -2.0F);
+				}
+				ekranKoordinatına(konum, konum).yuvarla();
 				çizer.setColor(yapım.ulus.renk);
+				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));
+			} else if (işlem instanceof ŞehirGeliştirmesi) {
+				final ŞehirGeliştirmesi yapım = (ŞehirGeliştirmesi)işlem;
+				konum.yaz(yapım.şehir.köşe.konum);
+				int aşağıdakiKomşular = 0;
+				for (final Kenar kenar : yapım.şehir.köşe.kenarlar.keySet()) {
+					if (yapım.şehir.köşe.kenarlar.get(kenar)) {
+						if (kenar.bitiş.konum.y > yapım.şehir.köşe.konum.y)
+							aşağıdakiKomşular++;
+					} else {
+						if (kenar.başlangıç.konum.y > yapım.şehir.köşe.konum.y)
+							aşağıdakiKomşular++;
+					}
+				}
+				konum.y += Bölge.KENAR_SİNÜS / (aşağıdakiKomşular > 1 ? 2.0F : -2.0F);
+				ekranKoordinatına(konum, konum).yuvarla();
+				çizer.setColor(yapım.şehir.ulus.renk);
 				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));
 			}
 		}
@@ -149,6 +183,7 @@ public class DünyaArayüzü {
 		if (duraklatıldı)
 			yazıYaz(çizer, (int)Math.round(SoyutKuruluş.GÖRSELLEŞTİRİCİ.boyut.x / 2.0F), 100, Color.BLACK,
 				"D U R A K L A T I L D I !");
+		SoyutKuruluş.UYGULAMA.süreceGeç(-1);
 	}
 	
 	public Vektör2 ekranKoordinatına(final Vektör2 dünyaKoordinatı, final Vektör2 hedef) {

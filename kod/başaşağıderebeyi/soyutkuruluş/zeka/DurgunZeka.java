@@ -17,7 +17,7 @@ public class DurgunZeka extends Zeka {
 	@Override
 	public void günlük() {
 		for (final Şehir şehir : ulus.şehirler)
-			şehir.geliştir();
+			ulus.dünya.şehriGeliştir(şehir);
 	}
 
 	@Override
@@ -33,26 +33,29 @@ public class DurgunZeka extends Zeka {
 				else if (takas.verilen == CEVHER)
 					satCevher = takas;
 				else
-					takas.gerçekleştir(ulus, ulus.durum(takas.verilen));
+					takas.olabildiğince(ulus);
 			} else if (takas.alınan == BUĞDAY)
 				alBuğday = takas;
 			else if (takas.alınan == CEVHER)
 				alCevher = takas;
 		}
-		final float cevherOranı = ulus.durum(CEVHER) / ulus.durum(BUĞDAY);
+		final float cevherOranı = ulus.dene(BUĞDAY) ? (float)ulus.durum(CEVHER) / ulus.durum(BUĞDAY) : Float.MAX_VALUE;
 		if (cevherOranı > 15.0F) {
-			satCevher.gerçekleştir(ulus, ulus.durum(CEVHER) * 0.73F);
-			alBuğday.gerçekleştir(ulus, ulus.gümüş);
+			satCevher.gerçekleştir(ulus);
+			alBuğday.olabildiğince(ulus);
 		} else if (cevherOranı > 1.6F) {
-			alBuğday.varanakadar(ulus, ulus.durum(CEVHER) / 1.5F);
+			alBuğday.olabildiğince(ulus);
 		} else if (Math.abs(cevherOranı - 1.5F) <= 0.1F) {
-			alBuğday.gerçekleştir(ulus, ulus.gümüş * 0.4F);
-			alCevher.gerçekleştir(ulus, ulus.gümüş * 0.6F);
+			while (ulus.dene(null, 300)) {
+				alBuğday.gerçekleştir(ulus);
+				alCevher.gerçekleştir(ulus);
+				alCevher.gerçekleştir(ulus);
+			}
 		} else if (cevherOranı >= 0.15F) {
-			alCevher.varanakadar(ulus, ulus.durum(BUĞDAY) * 1.5F);
+			alCevher.olabildiğince(ulus);
 		} else {
-			satBuğday.gerçekleştir(ulus, ulus.durum(BUĞDAY) * 0.86F);
-			alCevher.gerçekleştir(ulus, ulus.gümüş);
+			satBuğday.gerçekleştir(ulus);
+			alCevher.olabildiğince(ulus);
 		}
 	}
 

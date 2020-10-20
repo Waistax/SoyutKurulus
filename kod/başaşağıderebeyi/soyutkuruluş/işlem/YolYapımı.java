@@ -18,10 +18,12 @@ public class YolYapımı extends Süreliİşlem {
 		super(ulus.dünya, Calendar.DAY_OF_MONTH, 40);
 		this.ulus = ulus;
 		this.kenar = kenar;
+		ulus.dünya.yapılanYollar.put(kenar, this);
 	}
 
 	@Override
 	public void tamamlandı() {
 		ulus.dünya.yollar.put(kenar, new Yol(ulus, kenar));
+		ulus.dünya.yapılanYollar.remove(kenar);
 	}
 }
