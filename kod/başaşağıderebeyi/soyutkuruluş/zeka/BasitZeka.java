@@ -19,6 +19,26 @@ public class BasitZeka extends Zeka {
 
 	@Override
 	public void günlük() {
+		for (final Yol yol : ulus.yollar) {
+			for (final Kenar kenar : yol.kenar.kenarlar) {
+				if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
+					ulus.dünya.yolOluştur(ulus, kenar);
+					return;
+				}
+			}
+		}
+		for (final Şehir şehir : ulus.şehirler) {
+			for (final Kenar kenar : şehir.köşe.kenarlar.keySet()) {
+				if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
+					ulus.dünya.yolOluştur(ulus, kenar);
+					return;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void aylık() {
 		Takas alOdun = null;
 		Takas satOdun = null;
 		Takas alTuğla = null;
@@ -51,31 +71,9 @@ public class BasitZeka extends Zeka {
 			satOdun.gerçekleştir(ulus, ulus.durum(ODUN) * 0.8F);
 			alTuğla.gerçekleştir(ulus, ulus.gümüş);
 		}
-		for (final Yol yol : ulus.yollar) {
-			for (final Kenar kenar : yol.kenar.kenarlar) {
-				if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
-					ulus.dünya.yolOluştur(ulus, kenar);
-					return;
-				}
-			}
-		}
-		for (final Şehir şehir : ulus.şehirler) {
-			for (final Kenar kenar : şehir.köşe.kenarlar.keySet()) {
-				if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
-					ulus.dünya.yolOluştur(ulus, kenar);
-					return;
-				}
-			}
-		}
-	}
-
-	@Override
-	public void aylık() {
-		
 	}
 
 	@Override
 	public void yıllık() {
-		
 	}
 }

@@ -16,6 +16,12 @@ public class DurgunZeka extends Zeka {
 
 	@Override
 	public void günlük() {
+		for (final Şehir şehir : ulus.şehirler)
+			şehir.geliştir();
+	}
+
+	@Override
+	public void aylık() {
 		Takas alBuğday = null;
 		Takas satBuğday = null;
 		Takas alCevher = null;
@@ -48,12 +54,6 @@ public class DurgunZeka extends Zeka {
 			satBuğday.gerçekleştir(ulus, ulus.durum(BUĞDAY) * 0.86F);
 			alCevher.gerçekleştir(ulus, ulus.gümüş);
 		}
-		for (final Şehir şehir : ulus.şehirler)
-			şehir.geliştir();
-	}
-
-	@Override
-	public void aylık() {
 	}
 
 	@Override

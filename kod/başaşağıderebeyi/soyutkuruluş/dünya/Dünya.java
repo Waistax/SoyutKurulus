@@ -8,6 +8,7 @@ package başaşağıderebeyi.soyutkuruluş.dünya;
 import static başaşağıderebeyi.soyutkuruluş.dünya.Kaynak.*;
 
 import başaşağıderebeyi.matematik.*;
+import başaşağıderebeyi.soyutkuruluş.işlem.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
 
 import java.awt.*;
@@ -26,6 +27,7 @@ public class Dünya {
 	public final List<Kenar> kenarlar;
 	public final List<Ulus> uluslar;
 	public final List<Takas> takaslar;
+	public final List<Süreliİşlem> işlemler;
 	public final Map<Köşe, Şehir> şehirler;
 	public final Map<Kenar, Yol> yollar;
 	public final Calendar takvim;
@@ -36,6 +38,7 @@ public class Dünya {
 		kenarlar = new ArrayList<>();
 		uluslar = new ArrayList<>();
 		takaslar = new ArrayList<>();
+		işlemler = new ArrayList<>();
 		şehirler = new HashMap<>();
 		yollar = new HashMap<>();
 		takvim = Calendar.getInstance();
@@ -122,6 +125,9 @@ public class Dünya {
 	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
 		if (şehirler.containsKey(köşe))
 			return false;
+		for (final Süreliİşlem işlem : işlemler)
+			if (işlem instanceof ŞehirYapımı && ((ŞehirYapımı)işlem).köşe == köşe)
+				return false;
 		for (final Kenar kenar : köşe.kenarlar.keySet())
 			if (köşe.kenarlar.get(kenar)) {
 				if (şehirler.containsKey(kenar.bitiş))
@@ -146,13 +152,23 @@ public class Dünya {
 		ulus.ekle(KOYUN, -1.0F);
 		ulus.ekle(ODUN, -1.0F);
 		ulus.ekle(TUĞLA, -1.0F);
+		işlemler.add(new ŞehirYapımı(ulus, köşe));
+	}
+	
+	public void başlangıçŞehriOluştur(final Ulus ulus, final Köşe köşe) {
+		if (!şehirOluşturabilirMi(ulus, köşe))
+			return;
 		final Şehir şehir = new Şehir(ulus, köşe);
-		şehirler.put(köşe, şehir);
+		şehir.seviye = 1.0F;
+		ulus.dünya.şehirler.put(köşe, şehir);
 	}
 	
 	public boolean yolOluşturabilirMi(final Ulus ulus, final Kenar kenar) {
 		if (yollar.containsKey(kenar))
 			return false;
+		for (final Süreliİşlem işlem : işlemler)
+			if (işlem instanceof YolYapımı && ((YolYapımı)işlem).kenar == kenar)
+				return false;
 		final Şehir başlangıç = şehirler.get(kenar.başlangıç);
 		if (başlangıç != null && başlangıç.ulus == ulus)
 			return true;
@@ -176,15 +192,29 @@ public class Dünya {
 			return;
 		ulus.ekle(ODUN, -1.0F);
 		ulus.ekle(TUĞLA, -1.0F);
-		final Yol yol = new Yol(ulus, kenar);
-		yollar.put(kenar, yol);
+		işlemler.add(new YolYapımı(ulus, kenar));
 	}
 	
 	public void günlük() {
+		final int eskiAy = takvim.get(Calendar.MONTH);
+		takvim.add(Calendar.DAY_OF_MONTH, 1);
 		for (final Yol yol : yollar.values())
 			yol.topla();
+		for (int i = işlemler.size() - 1; i > -1; i--) {
+			final Süreliİşlem işlem = işlemler.get(i);
+			if (takvim.compareTo(işlem.tamamlanmaZamanı) >= 0) {
+				işlem.tamamlandı();
+				işlemler.remove(i);
+			}
+		}
 		for (final Ulus ulus : uluslar)
 			ulus.zeka.günlük();
+		if (eskiAy != takvim.get(Calendar.MONTH)) {
+			aylık();
+			if (eskiAy == Calendar.DECEMBER)
+				yıllık();
+		}
+		System.gc();
 	}
 	
 	public void aylık() {

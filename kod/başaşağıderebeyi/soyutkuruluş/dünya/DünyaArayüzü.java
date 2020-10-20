@@ -8,12 +8,12 @@ package başaşağıderebeyi.soyutkuruluş.dünya;
 import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.motor.*;
 import başaşağıderebeyi.soyutkuruluş.*;
+import başaşağıderebeyi.soyutkuruluş.işlem.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
-import java.util.*;
 
 public class DünyaArayüzü {
 	public static final float KÖŞE_YARIÇAPI = 0.05F;
@@ -60,14 +60,7 @@ public class DünyaArayüzü {
 			sonZaman = şimdikiZaman;
 			if (bekleme >= GÜN_SÜRELERİ[hız]) {
 				bekleme -= GÜN_SÜRELERİ[hız];
-				final int eskiAy = dünya.takvim.get(Calendar.MONTH);
-				dünya.takvim.add(Calendar.DAY_OF_MONTH, 1);
 				dünya.günlük();
-				if (eskiAy != dünya.takvim.get(Calendar.MONTH)) {
-					dünya.aylık();
-					if (eskiAy == 11)
-						dünya.yıllık();
-				}
 			}
 		}
 		if (girdi.tuşBasıldı[KeyEvent.VK_SPACE]) {
@@ -133,6 +126,20 @@ public class DünyaArayüzü {
 			ekranKoordinatına(bölge.merkez, konum).yuvarla();
 			çizer.setColor(bölge.kaynak.renk);
 			yazıYaz(çizer, (int)konum.x, (int)konum.y, null, bölge.kaynak.toString(), ÜRETİM_SAYI_ŞABLONU.format(bölge.üretim));
+		}
+		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 8.0F)));
+		for (final Süreliİşlem işlem : dünya.işlemler) {
+			if (işlem instanceof YolYapımı) {
+				final YolYapımı yapım = (YolYapımı)işlem;
+				ekranKoordinatına(konum.araDeğer(yapım.kenar.başlangıç.konum, yapım.kenar.bitiş.konum, 0.5F, 0.5F), konum).yuvarla();
+				çizer.setColor(yapım.ulus.renk);
+				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));
+			} else if (işlem instanceof ŞehirYapımı) {
+				final ŞehirYapımı yapım = (ŞehirYapımı)işlem;
+				ekranKoordinatına(yapım.köşe.konum, konum).yuvarla();
+				çizer.setColor(yapım.ulus.renk);
+				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));
+			}
 		}
 		çizer.setFont(new Font("Verdana", Font.ITALIC, 16));
 		çizer.setColor(Color.WHITE);

@@ -5,8 +5,6 @@
  */
 package başaşağıderebeyi.soyutkuruluş.yaratıcı;
 
-import static başaşağıderebeyi.soyutkuruluş.dünya.Kaynak.*;
-
 import başaşağıderebeyi.matematik.*;
 import başaşağıderebeyi.soyutkuruluş.dünya.*;
 import başaşağıderebeyi.soyutkuruluş.ulus.*;
@@ -68,12 +66,7 @@ public class RastgeleYaratıcı implements Yaratıcı {
 			do {
 				köşe = dünya.köşeler.get(rastgele.nextInt(dünya.köşeler.size()));
 			} while (!dünya.şehirOluşturabilirMi(ulus, köşe));
-			ulus.ekle(BUĞDAY, 1.0F);
-			ulus.ekle(KOYUN, 1.0F);
-			ulus.ekle(ODUN, 1.0F);
-			ulus.ekle(TUĞLA, 1.0F);
-			dünya.şehirOluştur(ulus, köşe);
-			ulus.şehirler.get(0).seviye = 1.0F;
+			dünya.başlangıçŞehriOluştur(ulus, köşe);
 		}
 		return dünya;
 	}

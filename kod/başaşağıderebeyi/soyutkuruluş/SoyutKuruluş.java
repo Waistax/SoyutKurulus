@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.8";
+	public static final String SÜRÜM = "0.9";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	
