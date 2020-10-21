@@ -15,7 +15,7 @@ public class YolYapımı extends Süreliİşlem {
 	public final Kenar kenar;
 	
 	public YolYapımı(final Ulus ulus, final Kenar kenar) {
-		super(ulus.dünya, Calendar.DAY_OF_MONTH, 40);
+		super(ulus.dünya, Calendar.DAY_OF_MONTH, 120);
 		this.ulus = ulus;
 		this.kenar = kenar;
 		ulus.dünya.yapılanYollar.put(kenar, this);

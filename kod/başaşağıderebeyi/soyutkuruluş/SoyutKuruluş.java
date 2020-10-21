@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SoyutKuruluş implements Uygulama {
-	public static final String SÜRÜM = "0.10";
+	public static final String SÜRÜM = "0.11";
 	public static final SoyutKuruluş UYGULAMA = new SoyutKuruluş();
 	public static final AWTGörselleştirici GÖRSELLEŞTİRİCİ = new AWTGörselleştirici();
 	public static final Süreç[] SÜREÇLER = {
@@ -59,10 +59,9 @@ public class SoyutKuruluş implements Uygulama {
 			dünyaArayüzü.kare(GÖRSELLEŞTİRİCİ.girdi, GÖRSELLEŞTİRİCİ.çizer, dünya);
 			final Ulus ulus = dünya.uluslar.get(0);
 			GÖRSELLEŞTİRİCİ.çizer.setColor(Color.WHITE);
-			GÖRSELLEŞTİRİCİ.çizer.drawString("GÜMÜŞ: " + ulus.gümüş, 10, 180);
 			for (int i = 0; i < DEĞERLER.length; i++) {
 				GÖRSELLEŞTİRİCİ.çizer.setColor(DEĞERLER[i].renk);
-				GÖRSELLEŞTİRİCİ.çizer.drawString(DEĞERLER[i] + ": " + ulus.envanter[i], 10, 200 + i * 20);
+				GÖRSELLEŞTİRİCİ.çizer.drawString(DEĞERLER[i] + ": " + ulus.envanter[i] + " (" + ulus.gelir[i] + ")", 10, 200 + i * 20);
 			}
 		}
 		GÖRSELLEŞTİRİCİ.çizer.setFont(new Font("Verdana", Font.ITALIC, 16));

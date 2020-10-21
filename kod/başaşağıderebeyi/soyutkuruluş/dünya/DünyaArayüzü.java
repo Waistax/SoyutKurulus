@@ -28,6 +28,7 @@ public class DünyaArayüzü {
 	public static final int YAKINLAŞTIRMA_TABAN = 20;
 	public static final DateFormat TAKVİM_TARİHİ_ŞABLONU = DateFormat.getDateInstance(DateFormat.LONG);
 	public static final float[] GÜN_SÜRELERİ = { 3.0F, 1.0F, 0.3F, 0.1F, 0.03F, 0.01F, 0.003F, 0.0F };
+	public static final float YOL_KALINLIĞI = 0.05F;
 	
 	static {
 		for (int i = 0; i < GÜN_SÜRELERİ.length; i++)
@@ -94,7 +95,7 @@ public class DünyaArayüzü {
 		final Vektör2 başlangıç = new Vektör2();
 		final Vektör2 bitiş = new Vektör2();
 		final Stroke kalınlık = çizer.getStroke();
-		final Stroke yolKalınlığı = new BasicStroke(ölçek / 10.0F);
+		final Stroke yolKalınlığı = new BasicStroke(YOL_KALINLIĞI * ölçek);
 		for (final Kenar kenar : dünya.kenarlar) {
 			final Yol yol = dünya.yollar.get(kenar);
 			çizer.setColor(yol != null ? yol.ulus.renk : Color.WHITE);
@@ -159,17 +160,21 @@ public class DünyaArayüzü {
 			} else if (işlem instanceof ŞehirGeliştirmesi) {
 				final ŞehirGeliştirmesi yapım = (ŞehirGeliştirmesi)işlem;
 				konum.yaz(yapım.şehir.köşe.konum);
-				int aşağıdakiKomşular = 0;
-				for (final Kenar kenar : yapım.şehir.köşe.kenarlar.keySet()) {
-					if (yapım.şehir.köşe.kenarlar.get(kenar)) {
-						if (kenar.bitiş.konum.y > yapım.şehir.köşe.konum.y)
-							aşağıdakiKomşular++;
-					} else {
-						if (kenar.başlangıç.konum.y > yapım.şehir.köşe.konum.y)
-							aşağıdakiKomşular++;
+				if (yapım.şehir.köşe.kenarlar.size() == 3) {
+					int aşağıdakiKomşular = 0;
+					for (final Kenar kenar : yapım.şehir.köşe.kenarlar.keySet()) {
+						if (yapım.şehir.köşe.kenarlar.get(kenar)) {
+							if (kenar.bitiş.konum.y > yapım.şehir.köşe.konum.y)
+								aşağıdakiKomşular++;
+						} else {
+							if (kenar.başlangıç.konum.y > yapım.şehir.köşe.konum.y)
+								aşağıdakiKomşular++;
+						}
 					}
+					konum.y += Bölge.KENAR_SİNÜS / (aşağıdakiKomşular > 1 ? 2.0F : -2.0F);
+				} else {
+					konum.y += Bölge.KENAR_SİNÜS / (konum.y > 0.0F ? 2.0F : -2.0F);
 				}
-				konum.y += Bölge.KENAR_SİNÜS / (aşağıdakiKomşular > 1 ? 2.0F : -2.0F);
 				ekranKoordinatına(konum, konum).yuvarla();
 				çizer.setColor(yapım.şehir.ulus.renk);
 				yazıYaz(çizer, (int)konum.x, (int)konum.y, Color.BLACK, TAKVİM_TARİHİ_ŞABLONU.format(yapım.tamamlanmaZamanı.getTime()));

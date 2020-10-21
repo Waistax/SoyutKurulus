@@ -23,20 +23,14 @@ public class BasitZeka extends Zeka {
 			{ 40.0F, 0.0F, 60.0F, 0.0F, 0.0F }
 	};
 	
-	public final Map<Kaynak, Takas> al;
-	public final Map<Kaynak, Takas> sat;
+	public final List<Kenar> yolYapılacaklar;
 	
 	public int hedef;
 	
 	public BasitZeka(Ulus ulus) {
 		super(ulus);
-		al = new HashMap<>();
-		sat = new HashMap<>();
-		for (final Takas takas : ulus.takaslar)
-			if (takas.alınan != null)
-				al.put(takas.alınan, takas);
-			else
-				sat.put(takas.verilen, takas);
+		yolYapılacaklar = new ArrayList<>();
+		hedef = ŞEHİR_YAP;
 	}
 
 	@Override
@@ -48,22 +42,38 @@ public class BasitZeka extends Zeka {
 					hedef = ŞEHİR_YAP;
 					return;
 				}
+			yolYapılacaklar.clear();
 			for (final Yol yol : ulus.yollar)
 				for (final Kenar kenar : yol.kenar.kenarlar)
-					if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
-						ulus.dünya.yolOluştur(ulus, kenar);
-						return;
-					}
+					if (ulus.dünya.yolOluşturabilirMi(ulus, kenar))
+						yolYapılacaklar.add(kenar);
 			for (final Şehir şehir : ulus.şehirler)
 				for (final Kenar kenar : şehir.köşe.kenarlar.keySet())
-					if (ulus.dünya.yolOluşturabilirMi(ulus, kenar)) {
-						ulus.dünya.yolOluştur(ulus, kenar);
+					if (ulus.dünya.yolOluşturabilirMi(ulus, kenar))
+						yolYapılacaklar.add(kenar);
+			if (yolYapılacaklar.isEmpty()) {
+				for (final YolYapımı yapım : ulus.dünya.yapılanYollar.values())
+					if (yapım.ulus == ulus)
 						return;
+				hedef = GELİŞTİR;
+			} else {
+				Kenar enAzBağlantılı = null;
+				int bağlantıSayısı = 1000;
+				for (final Kenar kenar : yolYapılacaklar) {
+					int mevcutBağlantıSayısı = 0;
+					for (final Kenar diğer : kenar.kenarlar) {
+						final Yol yol = ulus.dünya.yollar.get(diğer);
+						if (yol != null && yol.ulus == ulus)
+							mevcutBağlantıSayısı++;
 					}
-			for (final Süreliİşlem işlem : ulus.dünya.işlemler)
-				if (işlem instanceof YolYapımı && ((YolYapımı)işlem).ulus == ulus)
-					return;
-			hedef = GELİŞTİR;
+					if (bağlantıSayısı > mevcutBağlantıSayısı) {
+						enAzBağlantılı = kenar;
+						bağlantıSayısı = mevcutBağlantıSayısı;
+					}
+				}
+				if (enAzBağlantılı != null)
+					ulus.dünya.yolOluştur(ulus, enAzBağlantılı);
+			}
 			return;
 		case ŞEHİR_YAP:
 			for (final Köşe köşe : ulus.dünya.köşeler)
@@ -102,47 +112,13 @@ public class BasitZeka extends Zeka {
 			if (tampon < 0)
 				break;
 		}
-		for (int i = 0; i < DEĞERLER.length - 1; i++) {
-			sat.get(DEĞERLER[önemSırası[DEĞERLER.length - 1]]).gerçekleştir(ulus);
-			al.get(DEĞERLER[önemSırası[i]]).gerçekleştir(ulus);
-		}
-//		switch (hedef) {
-//		case YOL_YAP:
-//			if (odunYok) {
-//				if (tuğlaYok) {
-//					sat.get(BUĞDAY).gerçekleştir(ulus);
-//					sat.get(KOYUN).gerçekleştir(ulus);
-//					sat.get(CEVHER).gerçekleştir(ulus);
-//					al.get(ulus.durum(ODUN) < ulus.durum(TUĞLA) ? ODUN : TUĞLA).gerçekleştir(ulus);
-//				} else {
-//					sat.get(BUĞDAY).gerçekleştir(ulus);
-//					sat.get(KOYUN).gerçekleştir(ulus);
-//					sat.get(CEVHER).gerçekleştir(ulus);
-//					al.get(ODUN).gerçekleştir(ulus);
-//				}
-//			} else if (tuğlaYok) {
-//				sat.get(BUĞDAY).gerçekleştir(ulus);
-//				sat.get(KOYUN).gerçekleştir(ulus);
-//				sat.get(CEVHER).gerçekleştir(ulus);
-//				al.get(TUĞLA).gerçekleştir(ulus);
-//			}
-//			return;
-//		case ŞEHİR_YAP:
-//			return;
-//		case GELİŞTİR:
-//			if (ulus.gelir(BUĞDAY) == 0)
-//				al.get(BUĞDAY).gerçekleştir(ulus);
-//			else
-//				sat.get(BUĞDAY).gerçekleştir(ulus);
-//			sat.get(KOYUN).gerçekleştir(ulus);
-//			if (ulus.gelir(CEVHER) == 0)
-//				al.get(CEVHER).gerçekleştir(ulus);
-//			else
-//				sat.get(CEVHER).gerçekleştir(ulus);
-//			sat.get(ODUN).gerçekleştir(ulus);
-//			sat.get(TUĞLA).gerçekleştir(ulus);
-//			return;
-//		}
+		for (int i = 0; i < DEĞERLER.length - 1; i++)
+			for (int j = DEĞERLER.length - 1; j > i; j--)
+				if (ulus.gelir(DEĞERLER[önemSırası[j]]) > 0 && (
+						ulus.gelir(DEĞERLER[önemSırası[i]]) == 0 ||
+						ulus.durum(DEĞERLER[önemSırası[i]]) * 4 <= ulus.durum(DEĞERLER[önemSırası[j]])
+						))
+					ulus.takaslar.get(0).varanakadar(ulus, DEĞERLER[önemSırası[j]], DEĞERLER[önemSırası[i]], ulus.durum(DEĞERLER[önemSırası[j]]) / 5);
 	}
 
 	@Override

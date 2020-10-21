@@ -50,10 +50,7 @@ public class Dünya {
 		takvim = Calendar.getInstance();
 		takvim.clear();
 		takvim.set(0, 11, 31);
-		for (final Kaynak kaynak : DEĞERLER) {
-			takaslar.add(new Takas(null, 100, kaynak, 4));
-			takaslar.add(new Takas(kaynak, 1, null, 100));
-		}
+		takaslar.add(new Takas(null, 4));
 	}
 	
 	public void şekliGüncelle() {
@@ -132,8 +129,7 @@ public class Dünya {
 	
 	public void ulusOluştur(final Color renk) {
 		final Ulus ulus = new Ulus(this, renk);
-		for (int i = 0; i < DEĞERLER.length * 2; i++)
-			ulus.takaslar.add(takaslar.get(i));
+		ulus.takaslar.add(takaslar.get(0));
 	}
 
 	public boolean başlangıçŞehriOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
@@ -155,6 +151,7 @@ public class Dünya {
 			return;
 		final Şehir şehir = new Şehir(ulus, köşe);
 		ulus.dünya.şehirler.put(köşe, şehir);
+		ulus.geliriHesapla();
 	}
 	
 	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
@@ -169,17 +166,17 @@ public class Dünya {
 	
 	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
 		if (!(
-				ulus.dene(BUĞDAY) &&
-				ulus.dene(KOYUN) &&
-				ulus.dene(ODUN) &&
-				ulus.dene(TUĞLA)))
+				ulus.dene(BUĞDAY, 10) &&
+				ulus.dene(KOYUN, 10) &&
+				ulus.dene(ODUN, 10) &&
+				ulus.dene(TUĞLA, 10)))
 			return;
 		if (!şehirOluşturabilirMi(ulus, köşe))
 			return;
-		ulus.çıkar(BUĞDAY);
-		ulus.çıkar(KOYUN);
-		ulus.çıkar(ODUN);
-		ulus.çıkar(TUĞLA);
+		ulus.çıkar(BUĞDAY, 10);
+		ulus.çıkar(KOYUN, 10);
+		ulus.çıkar(ODUN, 10);
+		ulus.çıkar(TUĞLA, 10);
 		new ŞehirYapımı(ulus, köşe);
 	}
 	
@@ -190,8 +187,8 @@ public class Dünya {
 			if (işlem instanceof ŞehirGeliştirmesi && ((ŞehirGeliştirmesi)işlem).şehir == şehir)
 				return false;
 		if (
-				!şehir.ulus.dene(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 2) ||
-				!şehir.ulus.dene(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 3))
+				!şehir.ulus.dene(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 20) ||
+				!şehir.ulus.dene(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 30))
 			return false;
 		return true;
 	}
@@ -199,8 +196,8 @@ public class Dünya {
 	public void şehriGeliştir(final Şehir şehir) {
 		if (!şehirGeliştirilebilirMi(şehir))
 			return;
-		şehir.ulus.çıkar(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 2);
-		şehir.ulus.çıkar(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 3);
+		şehir.ulus.çıkar(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 20);
+		şehir.ulus.çıkar(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 30);
 		new ŞehirGeliştirmesi(şehir);
 	}
 	
@@ -226,21 +223,19 @@ public class Dünya {
 	
 	public void yolOluştur(final Ulus ulus, final Kenar kenar) {
 		if (!(
-				ulus.dene(ODUN) &&
-				ulus.dene(TUĞLA)))
+				ulus.dene(ODUN, 10) &&
+				ulus.dene(TUĞLA, 10)))
 			return;
 		if (!yolOluşturabilirMi(ulus, kenar))
 			return;
-		ulus.çıkar(ODUN);
-		ulus.çıkar(TUĞLA);
+		ulus.çıkar(ODUN, 10);
+		ulus.çıkar(TUĞLA, 10);
 		new YolYapımı(ulus, kenar);
 	}
 	
 	public void günlük() {
 		final int eskiAy = takvim.get(Calendar.MONTH);
 		takvim.add(Calendar.DAY_OF_MONTH, 1);
-		for (final Yol yol : yollar.values())
-			yol.topla();
 		for (int i = işlemler.size() - 1; i > -1; i--) {
 			final Süreliİşlem işlem = işlemler.get(i);
 			if (takvim.compareTo(işlem.tamamlanmaZamanı) >= 0) {

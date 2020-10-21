@@ -24,7 +24,6 @@ public class Ulus {
 	public final Color renk;
 
 	public Zeka zeka;
-	public int gümüş;
 
 	public Ulus(final Dünya dünya, final Color renk) {
 		this.dünya = dünya;
@@ -38,8 +37,6 @@ public class Ulus {
 	}
 	
 	public int durum(final Kaynak kaynak) {
-		if (kaynak == null)
-			return gümüş;
 		return envanter[kaynak.sıra];
 	}
 	
@@ -52,10 +49,7 @@ public class Ulus {
 	}
 	
 	public void ayarla(final Kaynak kaynak, final int miktar) {
-		if (kaynak == null)
-			gümüş = miktar;
-		else
-			envanter[kaynak.sıra] = miktar;
+		envanter[kaynak.sıra] = miktar;
 	}
 	
 	public void ekle(final Kaynak kaynak, final int miktar) {
@@ -81,7 +75,6 @@ public class Ulus {
 	public void sıfırla() {
 		for (final Kaynak kaynak : DEĞERLER)
 			sıfırla(kaynak);
-		gümüş = 0;
 	}
 	
 	public void geliriHesapla() {
@@ -91,10 +84,8 @@ public class Ulus {
 			for (final Bölge bölge : şehir.köşe.bölgeler)
 				gelir[bölge.kaynak.sıra] += bölge.üretim * şehir.seviye;
 	}
-	
+
 	public int gelir(final Kaynak kaynak) {
-		if (kaynak == null)
-			return yollar.size();
 		return gelir[kaynak.sıra];
 	}
 }
