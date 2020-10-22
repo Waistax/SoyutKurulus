@@ -23,8 +23,9 @@ public class ŞehirYapımı extends Süreliİşlem {
 
 	@Override
 	public void tamamlandı() {
-		ulus.dünya.şehirler.put(köşe, new Şehir(ulus, köşe));
+		final Şehir şehir = new Şehir(ulus, köşe);
+		ulus.dünya.şehirler.put(köşe, şehir);
 		ulus.dünya.yapılanŞehirler.remove(köşe);
-		ulus.geliriHesapla();
+		şehir.üretimiHesapla();
 	}
 }

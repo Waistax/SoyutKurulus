@@ -48,6 +48,13 @@ public class Ulus {
 		return dene(kaynak, 1);
 	}
 	
+	public boolean dene(final int[] miktarlar) {
+		for (int i = 0; i < DEĞERLER.length; i++)
+			if (envanter[i] < miktarlar[i])
+				return false;
+		return true;
+	}
+	
 	public void ayarla(final Kaynak kaynak, final int miktar) {
 		envanter[kaynak.sıra] = miktar;
 	}
@@ -60,12 +67,22 @@ public class Ulus {
 		ekle(kaynak, 1);
 	}
 	
+	public void ekle(final int[] miktarlar) {
+		for (int i = 0; i < DEĞERLER.length; i++)
+			envanter[i] += miktarlar[i];
+	}
+	
 	public void çıkar(final Kaynak kaynak, final int miktar) {
 		ekle(kaynak, -miktar);
 	}
 	
 	public void çıkar(final Kaynak kaynak) {
 		çıkar(kaynak, 1);
+	}
+	
+	public void çıkar(final int[] miktarlar) {
+		for (int i = 0; i < DEĞERLER.length; i++)
+			envanter[i] -= miktarlar[i];
 	}
 	
 	public void sıfırla(final Kaynak kaynak) {
@@ -81,8 +98,8 @@ public class Ulus {
 		for (int i = 0; i < DEĞERLER.length; i++)
 			gelir[i] = 0;
 		for (final Şehir şehir : şehirler)
-			for (final Bölge bölge : şehir.köşe.bölgeler)
-				gelir[bölge.kaynak.sıra] += bölge.üretim * şehir.seviye;
+			for (int i = 0; i < DEĞERLER.length; i++)
+				gelir[i] += şehir.üretim[i];
 	}
 
 	public int gelir(final Kaynak kaynak) {

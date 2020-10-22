@@ -17,8 +17,11 @@ import java.util.List;
 
 public class Dünya {
 	public static final float ASGARİ_MESAFE = 0.9F;
-	public static final int SEVİYE_TAVAN = 9;
+	public static final int SEVİYE_TAVAN = 3;
 	public static final int SEVİYE_TABAN = 1;
+	public static final int[] ŞEHİR_MALİYETİ = { 1, 1, 0, 1, 1 };
+	public static final int[] YOL_MALİYETİ = { 0, 0, 0, 1, 1 };
+	public static final int[] GELİŞTİRME_MALİYETİ = { 2, 0, 3, 0, 0 };
 	
 	public static boolean aynı(final Vektör2 fark, final Köşe k1, final Köşe k2) {
 		return fark.çıkar(k1.konum, k2.konum).uzunluğunKaresi() < ASGARİ_MESAFE;
@@ -131,7 +134,7 @@ public class Dünya {
 		final Ulus ulus = new Ulus(this, renk);
 		ulus.takaslar.add(takaslar.get(0));
 	}
-
+	
 	public boolean başlangıçŞehriOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
 		if (şehirVarMı(köşe))
 			return false;
@@ -151,7 +154,7 @@ public class Dünya {
 			return;
 		final Şehir şehir = new Şehir(ulus, köşe);
 		ulus.dünya.şehirler.put(köşe, şehir);
-		ulus.geliriHesapla();
+		şehir.üretimiHesapla();
 	}
 	
 	public boolean şehirOluşturabilirMi(final Ulus ulus, final Köşe köşe) {
@@ -165,18 +168,11 @@ public class Dünya {
 	}
 	
 	public void şehirOluştur(final Ulus ulus, final Köşe köşe) {
-		if (!(
-				ulus.dene(BUĞDAY, 10) &&
-				ulus.dene(KOYUN, 10) &&
-				ulus.dene(ODUN, 10) &&
-				ulus.dene(TUĞLA, 10)))
+		if (!ulus.dene(ŞEHİR_MALİYETİ))
 			return;
 		if (!şehirOluşturabilirMi(ulus, köşe))
 			return;
-		ulus.çıkar(BUĞDAY, 10);
-		ulus.çıkar(KOYUN, 10);
-		ulus.çıkar(ODUN, 10);
-		ulus.çıkar(TUĞLA, 10);
+		ulus.çıkar(ŞEHİR_MALİYETİ);
 		new ŞehirYapımı(ulus, köşe);
 	}
 	
@@ -186,18 +182,15 @@ public class Dünya {
 		for (final Süreliİşlem işlem : işlemler)
 			if (işlem instanceof ŞehirGeliştirmesi && ((ŞehirGeliştirmesi)işlem).şehir == şehir)
 				return false;
-		if (
-				!şehir.ulus.dene(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 20) ||
-				!şehir.ulus.dene(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 30))
-			return false;
 		return true;
 	}
 	
 	public void şehriGeliştir(final Şehir şehir) {
+		if (!şehir.ulus.dene(GELİŞTİRME_MALİYETİ))
+			return;
 		if (!şehirGeliştirilebilirMi(şehir))
 			return;
-		şehir.ulus.çıkar(Kaynak.BUĞDAY, şehir.seviye * şehir.seviye * 20);
-		şehir.ulus.çıkar(Kaynak.CEVHER, şehir.seviye * şehir.seviye * 30);
+		şehir.ulus.çıkar(GELİŞTİRME_MALİYETİ);
 		new ŞehirGeliştirmesi(şehir);
 	}
 	
@@ -222,14 +215,11 @@ public class Dünya {
 	}
 	
 	public void yolOluştur(final Ulus ulus, final Kenar kenar) {
-		if (!(
-				ulus.dene(ODUN, 10) &&
-				ulus.dene(TUĞLA, 10)))
+		if (!ulus.dene(YOL_MALİYETİ))
 			return;
 		if (!yolOluşturabilirMi(ulus, kenar))
 			return;
-		ulus.çıkar(ODUN, 10);
-		ulus.çıkar(TUĞLA, 10);
+		ulus.çıkar(YOL_MALİYETİ);
 		new YolYapımı(ulus, kenar);
 	}
 	
@@ -253,13 +243,14 @@ public class Dünya {
 	}
 	
 	public void aylık() {
-		for (final Şehir şehir : şehirler.values())
-			şehir.topla();
 		for (final Ulus ulus : uluslar)
 			ulus.zeka.aylık();
 	}
 	
 	public void yıllık() {
+		for (final Şehir şehir : şehirler.values())
+			for (int i = 0; i < DEĞERLER.length; i++)
+				şehir.ulus.envanter[i] += şehir.üretim[i];
 		for (final Ulus ulus : uluslar)
 			ulus.zeka.yıllık();
 	}

@@ -20,6 +20,6 @@ public class ŞehirGeliştirmesi extends Süreliİşlem {
 	@Override
 	public void tamamlandı() {
 		şehir.seviye++;
-		şehir.ulus.geliriHesapla();
+		şehir.üretimiHesapla();
 	}
 }
