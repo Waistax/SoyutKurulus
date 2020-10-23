@@ -17,11 +17,13 @@ import java.util.List;
 
 public class Dünya {
 	public static final float ASGARİ_MESAFE = 0.9F;
-	public static final int SEVİYE_TAVAN = 3;
-	public static final int SEVİYE_TABAN = 1;
-	public static final int[] ŞEHİR_MALİYETİ = { 1, 1, 0, 1, 1 };
-	public static final int[] YOL_MALİYETİ = { 0, 0, 0, 1, 1 };
-	public static final int[] GELİŞTİRME_MALİYETİ = { 2, 0, 3, 0, 0 };
+	public static final float SEVİYE_TAVAN = 2.0F;
+	public static final float SEVİYE_TABAN = 1.0F;
+	public static final float SEVİYE_ADIMI = 0.1F;
+	public static final float ÜRETİM_KATSAYISI = 0.1F;
+	public static final float[] ŞEHİR_MALİYETİ = { 1.0F, 1.0F, 0.0F, 1.0F, 1.0F };
+	public static final float[] YOL_MALİYETİ = { 0.0F, 0.0F, 0.0F, 1.0F, 1.0F };
+	public static final float[] GELİŞTİRME_MALİYETİ = { 0.2F, 0.0F, 0.3F, 0.0F, 0.0F };
 	
 	public static boolean aynı(final Vektör2 fark, final Köşe k1, final Köşe k2) {
 		return fark.çıkar(k1.konum, k2.konum).uzunluğunKaresi() < ASGARİ_MESAFE;
@@ -243,14 +245,14 @@ public class Dünya {
 	}
 	
 	public void aylık() {
+		for (final Şehir şehir : şehirler.values())
+			for (int i = 0; i < DEĞERLER.length; i++)
+				şehir.ulus.envanter[i] += şehir.üretim[i];
 		for (final Ulus ulus : uluslar)
 			ulus.zeka.aylık();
 	}
 	
 	public void yıllık() {
-		for (final Şehir şehir : şehirler.values())
-			for (int i = 0; i < DEĞERLER.length; i++)
-				şehir.ulus.envanter[i] += şehir.üretim[i];
 		for (final Ulus ulus : uluslar)
 			ulus.zeka.yıllık();
 	}

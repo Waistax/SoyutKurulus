@@ -26,6 +26,7 @@ public class DünyaArayüzü {
 	public static final int YAKINLAŞTIRMA_BAŞLANGIÇ = 23;
 	public static final int YAKINLAŞTIRMA_TAVAN = 26;
 	public static final int YAKINLAŞTIRMA_TABAN = 20;
+	public static final DecimalFormat ÜRETİM_SAYI_ŞABLONU = new DecimalFormat("0.0");
 	public static final DateFormat TAKVİM_TARİHİ_ŞABLONU = DateFormat.getDateInstance(DateFormat.LONG);
 	public static final float[] GÜN_SÜRELERİ = { 3.0F, 1.0F, 0.3F, 0.1F, 0.03F, 0.01F, 0.003F, 0.0F };
 	public static final float YOL_KALINLIĞI = 0.05F;
@@ -107,7 +108,7 @@ public class DünyaArayüzü {
 		çizer.setStroke(kalınlık);
 		final Vektör2 köşeDaireÖlçekli = new Vektör2(KÖŞE_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
 		final Vektör2 şehirDaireÖlçekli = new Vektör2(ŞEHİR_DAİRE_VEKTÖRÜ).çarp(ölçek).yuvarla();
-		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 4.0F)));
+		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 6.0F)));
 		for (final Köşe köşe : dünya.köşeler) {
 			final Şehir şehir = dünya.şehirler.get(köşe);
 			if (şehir != null) {
@@ -116,7 +117,7 @@ public class DünyaArayüzü {
 				çizer.fillOval((int)konum.x, (int)konum.y, (int)şehirDaireÖlçekli.x, (int)şehirDaireÖlçekli.y);
 				ekranKoordinatına(köşe.konum, konum);
 				çizer.setColor(Color.BLACK);
-				yazıYaz(çizer, (int)konum.x, (int)konum.y, null, String.valueOf(şehir.seviye));
+				yazıYaz(çizer, (int)konum.x, (int)konum.y, null, ÜRETİM_SAYI_ŞABLONU.format(şehir.seviye));
 			} else {
 				ekranKoordinatına(konum.çıkar(köşe.konum, KÖŞE_ÇEYREK_DAİRE_VEKTÖRÜ), konum).yuvarla();
 				çizer.setColor(Color.WHITE);
@@ -127,7 +128,7 @@ public class DünyaArayüzü {
 		for (final Bölge bölge : dünya.bölgeler) {
 			ekranKoordinatına(bölge.merkez, konum).yuvarla();
 			çizer.setColor(bölge.kaynak.renk);
-			yazıYaz(çizer, (int)konum.x, (int)konum.y, null, bölge.kaynak.toString(), String.valueOf(bölge.üretim));
+			yazıYaz(çizer, (int)konum.x, (int)konum.y, null, bölge.kaynak.toString(), ÜRETİM_SAYI_ŞABLONU.format(bölge.üretim));
 		}
 		çizer.setFont(new Font("Verdana", Font.ITALIC, (int)Math.round(ölçek / 8.0F)));
 		for (final Süreliİşlem işlem : dünya.işlemler) {

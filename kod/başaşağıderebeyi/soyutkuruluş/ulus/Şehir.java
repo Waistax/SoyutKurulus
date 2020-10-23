@@ -12,21 +12,21 @@ import başaşağıderebeyi.soyutkuruluş.dünya.*;
 public class Şehir {
 	public final Ulus ulus;
 	public final Köşe köşe;
-	public final int[] üretim;
+	public final float[] üretim;
 	
-	public int seviye;
+	public float seviye;
 	
 	public Şehir(final Ulus ulus, final Köşe köşe) {
 		this.ulus = ulus;
 		this.köşe = köşe;
-		üretim = new int[DEĞERLER.length];
+		üretim = new float[DEĞERLER.length];
 		seviye = Dünya.SEVİYE_TABAN;
 		ulus.şehirler.add(this);
 	}
 	
 	public void üretimiHesapla() {
 		for (final Bölge bölge : köşe.bölgeler)
-			üretim[bölge.kaynak.sıra] += bölge.üretim * seviye;
+			üretim[bölge.kaynak.sıra] += bölge.üretim * seviye * Dünya.ÜRETİM_KATSAYISI;
 		ulus.geliriHesapla();
 	}
 }

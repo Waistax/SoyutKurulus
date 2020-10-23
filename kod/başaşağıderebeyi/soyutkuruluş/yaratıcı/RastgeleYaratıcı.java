@@ -16,8 +16,8 @@ import java.util.*;
 public class RastgeleYaratıcı implements Yaratıcı {
 	public static final int RASTGELE_SATIR_TAVAN = 3;
 	public static final int RASTGELE_SATIR_TABAN = 3;
-	public static final int ÜRETİM_TAVAN = 5;
-	public static final int ÜRETİM_TABAN = 1;
+	public static final float ÜRETİM_TAVAN = 5.0F;
+	public static final float ÜRETİM_TABAN = 1.0F;
 	public static final Color[] ULUS_RENKLERİ = {
 			new Color(1.0F, 0.4F, 0.4F, 1.0F),
 			new Color(0.4F, 1.0F, 0.4F, 1.0F),
@@ -50,7 +50,11 @@ public class RastgeleYaratıcı implements Yaratıcı {
 						continue yatay;
 					merkez.x += Bölge.KENAR_SİNÜS * (j < 0 ? 1.0F : -1.0F);
 				}
-				final Bölge bölge = new Bölge(dünya, merkez, Kaynak.rastgele(rastgele), rastgele.nextInt(ÜRETİM_TAVAN - ÜRETİM_TABAN + 1) + ÜRETİM_TABAN);
+				final Bölge bölge = new Bölge(
+						dünya,
+						merkez,
+						Kaynak.rastgele(rastgele),
+						Math.round((rastgele.nextFloat() * (ÜRETİM_TAVAN - ÜRETİM_TABAN) + ÜRETİM_TABAN) * 10.0F) / 10.0F);
 				dünya.bölgeler.add(bölge);
 			}
 			if (i < 0)

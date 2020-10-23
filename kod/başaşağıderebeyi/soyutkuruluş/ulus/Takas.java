@@ -40,10 +40,12 @@ public class Takas {
 	}
 	
 	public void varanakadar(final Ulus ulus, final Kaynak ödeme, final Kaynak istenen, final int hedef) {
-		while (ulus.durum(istenen) < hedef)
+		System.out.println("TAKAS: U" + ulus.renk + " Ö" + ödeme + " İ" + istenen + " H" + hedef);
+		while (ulus.durum(istenen) < hedef) {
 			if (yapabilirMi(ulus, ödeme))
 				takas(ulus, ödeme, istenen);
 			else
 				return;
+		}
 	}
 }

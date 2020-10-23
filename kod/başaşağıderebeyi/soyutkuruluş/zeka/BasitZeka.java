@@ -84,13 +84,21 @@ public class BasitZeka extends Zeka {
 			if (tampon < 0)
 				break;
 		}
-		for (int i = 0; i < DEĞERLER.length - 1; i++)
-			for (int j = DEĞERLER.length - 1; j > i; j--)
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("Ulus: " + ulus.renk);
+		for (int i = 0; i < DEĞERLER.length - 1; i++) {
+			System.out.println("I: " + DEĞERLER[önemSırası[i]] + " D" + ulus.envanter[önemSırası[i]] + " G" + ulus.gelir[önemSırası[i]]);
+			for (int j = DEĞERLER.length - 1; j > i; j--) {
+				System.out.println("J: " + DEĞERLER[önemSırası[j]] + " D" + ulus.envanter[önemSırası[j]] + " G" + ulus.gelir[önemSırası[j]]);
+				System.out.println("D1 " + (ulus.gelir(DEĞERLER[önemSırası[j]]) > 0));
+				System.out.println("D2 " + (ulus.gelir(DEĞERLER[önemSırası[i]]) == 0));
+				System.out.println("D3 " + (ulus.durum(DEĞERLER[önemSırası[i]]) * 4 <= ulus.durum(DEĞERLER[önemSırası[j]])));
 				if (ulus.gelir(DEĞERLER[önemSırası[j]]) > 0 && (
 						ulus.gelir(DEĞERLER[önemSırası[i]]) == 0 ||
-						ulus.durum(DEĞERLER[önemSırası[i]]) * 4 <= ulus.durum(DEĞERLER[önemSırası[j]])
-						))
-					ulus.takaslar.get(0).varanakadar(ulus, DEĞERLER[önemSırası[j]], DEĞERLER[önemSırası[i]], ulus.durum(DEĞERLER[önemSırası[j]]) / 5);
+						ulus.durum(DEĞERLER[önemSırası[i]]) * 4 <= ulus.durum(DEĞERLER[önemSırası[j]])))
+					ulus.takaslar.get(0).varanakadar(ulus, DEĞERLER[önemSırası[j]], DEĞERLER[önemSırası[i]], (int)Math.floor(ulus.durum(DEĞERLER[önemSırası[j]]) / 4.0F));
+			}
+		}
 		switch (hedef) {
 		case YOL_YAP:
 			Kenar enAzBağlantılı = null;
@@ -134,7 +142,7 @@ public class BasitZeka extends Zeka {
 			for (final Şehir şehir : geliştirilecekler) {
 				int mevcutDestek = 0;
 				for (final Bölge bölge : şehir.köşe.bölgeler) {
-					final int geliştirmeMaliyeti = Dünya.GELİŞTİRME_MALİYETİ[bölge.kaynak.sıra];
+					final float geliştirmeMaliyeti = Dünya.GELİŞTİRME_MALİYETİ[bölge.kaynak.sıra];
 					mevcutDestek += bölge.üretim * (geliştirmeMaliyeti == 0 ? 1 : 4 * geliştirmeMaliyeti);
 				}
 				if ((
